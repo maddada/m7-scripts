@@ -1,0 +1,54 @@
+#SingleInstance, force
+#NoEnv
+#Warn ; Enable warnings to assist with detecting common errors.
+SendMode Input  ; Recommended for new scripts due to its superior speed and reliability.
+
+; Set Icon: 
+I_PauseIcon = C:\Users\madda\Pictures\ico\soundoff.ico
+IfExist, %I_PauseIcon%
+Menu, Tray, Icon, %I_PauseIcon%
+
+;Reference: https://www.autohotkey.com/docs/commands/Send.htm
+; ^ {Ctrl} {Ctrl down} {Ctrl up}
+; + {Shift} {Shift down} {Shift up}
+; ! {Alt} {Alt down} {Alt up} ; Send !a presses Alt+A
+; # {LWin}
+
+; !Tab::Return ; Disable Alt Tab
+
+; MsgBox, Options, Title, Text, Timeout
+
+; Keep in mind that globals need to be declared here at the top of the file (before any return statements)
+; Solution  to: Warning: This variable has not been assigned a value
+Toggle := false
+
+
+^!w::
+    SoundBeep, 500, 600
+    reload
+return
+
+^!e::
+    Toggle := true
+    SoundBeep, 200, 600
+    ; MsgBox, , , On, 1
+    SetTimer, Trigger, -1
+    I_PlayIcon = C:\Users\madda\Pictures\ico\soundon.ico
+    IfExist, %I_PlayIcon%
+    Menu, Tray, Icon, %I_PlayIcon%
+return
+
+Trigger:
+    while (Toggle) {
+        Random, rand, 30000, 32000
+        ; Random, rand, 1000, 2000
+        Sleep % rand
+        SoundBeep, 1000, 100
+        Click WheelDown
+        Click WheelDown
+        Click WheelDown
+        Click WheelUp
+        Click WheelUp
+        Click WheelUp
+    }
+Return

@@ -1,0 +1,42 @@
+; ^ctrl !alt +shift #windows
+
+; #region Reference {Ctrl} {Ctrl down} {Ctrl up}
+; + {Shift} {Shift down} {Shift up}
+; ! {Alt} {Alt down} {Alt up} ; Send !a presses Alt+A
+; # {LWin}
+; Keep in mind that globals need to be declared here at the top of the file (before any return statements)
+; Reference: https://lexikos.github.io/v2/docs/commands/Send.htm
+; reference := 'reference'	; ignore
+; #endregion
+
+#SingleInstance Force
+#Warn	; warn about common issues
+#MaxThreadsPerHotkey 1
+ProcessSetPriority "High"
+SendMode "Play" ; Forces Send and SendRaw to use SendInput buffering for speed.
+
+; Reload on save
+~^s::
+{
+	if WinActive("Elden Ring.ahk")
+	{
+		Sleep 200
+		Reload
+	}
+	return
+}
+
+; Elden Ring
+#HotIf (WinActive("ahk_exe start_protected_game.exe"))
+F1:: Send "{SPACE}"
+F2:: Send "{s}"
+F3:: Send "+^{Down}"
+M::G
+Q:: Send "{s}"
+s:: Send "{s}"
+#HotIf
+
+; ^ {Ctrl} {Ctrl down} {Ctrl up}
+; + {Shift} {Shift down} {Shift up}
+; ! {Alt} {Alt down} {Alt up} ; Send !a presses Alt+A
+; # {LWin}

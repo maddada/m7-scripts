@@ -1,0 +1,41 @@
+#SingleInstance force
+LDownTime := A_TickCount
+LUpTime := A_TickCount
+LIsDown := 0
+
+*LButton::
+If (A_TickCount-LDownTime < 50 or A_TickCount-LUpTime < 20 or LIsDown)
+Return
+Else
+{
+Click D
+LIsDown :=1
+}
+
+LDownTime := A_TickCount
+Return
+
+*LButton Up::
+If (A_TickCount-LUpTime < 50 or A_TickCount-LDownTime < 20 or not LIsDown)
+Return
+Else
+{
+Click U
+LIsDown :=0
+}
+LUpTime := A_TickCount
+Return
+
+#SingleInstance, Force
+#KeyHistory, 0
+SetBatchLines, -1
+ListLines, Off
+SendMode Input ; Forces Send and SendRaw to use SendInput buffering for speed.
+SetTitleMatchMode, 3 ; A window's title must exactly match WinTitle to be a match.
+SetWorkingDir, %A_ScriptDir%
+SplitPath, A_ScriptName, , , , thisscriptname
+#MaxThreadsPerHotkey, 1 ; no re-entrant hotkey handling
+; DetectHiddenWindows, On
+; SetWinDelay, -1 ; Remove short delay done automatically after every windowing command except IfWinActive and IfWinExist
+; SetKeyDelay, -1, -1 ; Remove short delay done automatically after every keystroke sent by Send or ControlSend
+; SetMouseDelay, -1 ; Remove short delay done automatically after Click and MouseMove/Click/Drag
