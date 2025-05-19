@@ -196,16 +196,16 @@
                         console.log("Toggle button found, adding click listener");
                         toggleButton.addEventListener("click", (e) => {
                             console.log("Toggle button clicked");
-                            // click
                             toggleFeature();
                             e.preventDefault();
                         });
 
                         toggleButton.addEventListener("auxclick", (e) => {
-                            console.log("Toggle button clicked");
-                            // middleclick
-                            toggleSidebarWidth();
-                            e.preventDefault();
+                            console.log("Toggle button middle click event triggered");
+                            if (e.button === 1) {
+                                toggleSidebarWidth();
+                                e.preventDefault();
+                            }
                         });
 
                         // Stop observing once the element is found
