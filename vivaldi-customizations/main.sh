@@ -46,5 +46,5 @@ echo '</html>' >> "${INSTALL_PATH}window.html"
 
 echo
 echo "## Done"
-echo "Press Enter to exit..."
-read
+# echo "Press Enter to exit..."
+# read
