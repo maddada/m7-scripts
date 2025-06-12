@@ -81,7 +81,7 @@ function setState(newState, applyStyles, addEventListeners, removeEventListeners
             // Enable hover with hidden width
             applyStyles(hiddenSidebarWidth);
             addEventListeners();
-            addIconToSidebarButton(`◀︎`);
+            addIconToSidebarButton(`◁`);
             console.log("State: HIDDEN");
             break;
     }
