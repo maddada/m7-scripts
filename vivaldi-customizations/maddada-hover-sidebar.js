@@ -1,10 +1,12 @@
 let intervalId;
+let expandTimeout;
+let collapseTimeout;
 
 const sidebarStyles = `
     :root {
         --width-1: 300px;
         --width-minimized: {currentSidebarWidth};
-        --width-hovered: 259px;
+        --width-hovered: 260px;
     }
     #panels-container.panel-expanded {
         width: var(--width-1) !important;
@@ -17,7 +19,7 @@ const sidebarStyles = `
     }
     #panels-container {
         position: absolute !important;
-        height: calc(100vh - 76px) !important;
+        height: calc(100vh - 83px) !important;
         transition: width 0.1s ease-in-out !important;
     }
     .panel-collapse-guard {
@@ -31,9 +33,9 @@ const sidebarStyles = `
 
 // State management
 const STATES = {
-    PINNED: 'pinned',
-    OVERLAY: 'overlay',
-    HIDDEN: 'hidden'
+    PINNED: "pinned",
+    OVERLAY: "overlay",
+    HIDDEN: "hidden",
 };
 
 let currentState = STATES.OVERLAY;
@@ -116,17 +118,43 @@ function handleMouseEnter(panelsContainer) {
     console.log("Mouse enter event triggered, current state:", currentState);
     if (currentState === STATES.PINNED) return;
 
-    console.log("Expanding panel");
-    panelsContainer.classList.add("panel-expanded");
+    // Clear any pending collapse timeout
+    if (collapseTimeout) {
+        clearTimeout(collapseTimeout);
+        collapseTimeout = null;
+        console.log("Cleared collapse timeout");
+    }
+
+    // If already expanded, don't set a new timeout
+    if (panelsContainer.classList.contains("panel-expanded")) {
+        console.log("Panel already expanded, skipping timeout");
+        return;
+    }
+
+    // Set expand timeout
+    expandTimeout = setTimeout(() => {
+        console.log("Expanding panel after 20ms delay");
+        panelsContainer.classList.add("panel-expanded");
+        expandTimeout = null;
+    }, 20);
 }
 
 function handleMouseLeave(panelsContainer) {
     console.log("Mouse leave event triggered, current state:", currentState);
     if (currentState === STATES.PINNED) return;
 
-    setTimeout(() => {
-        console.log("Collapsing panel");
+    // Clear any pending expand timeout
+    if (expandTimeout) {
+        clearTimeout(expandTimeout);
+        expandTimeout = null;
+        console.log("Cleared expand timeout");
+    }
+
+    // Set collapse timeout
+    collapseTimeout = setTimeout(() => {
+        console.log("Collapsing panel after 300ms delay");
         panelsContainer.classList.remove("panel-expanded");
+        collapseTimeout = null;
     }, 300);
 }
 
@@ -244,6 +272,6 @@ function initHoverSidebar() {
 (function () {
     "use strict";
     console.log("Script starting execution");
-    intervalId = setInterval(initHoverSidebar, 400);
+    intervalId = setInterval(initHoverSidebar, 800);
     console.log("Interval set up to check for panels-container");
 })();
