@@ -1,0 +1,584 @@
+{
+  "schemes" : [
+    {
+      "if" : {
+        "device" : {
+          "vendorID" : "0x3f0",
+          "category" : "mouse",
+          "productID" : "0xd97",
+          "productName" : "HyperX Pulsefire Haste 2 Wireless"
+        }
+      },
+      "scrolling" : {
+        "distance" : {
+          "vertical" : 3
+        },
+        "speed" : {
+          "vertical" : 0
+        },
+        "reverse" : {
+          "vertical" : true
+        },
+        "acceleration" : {
+          "vertical" : 1
+        },
+        "modifiers" : {
+          "vertical" : {
+            "command" : {
+              "type" : "zoom"
+            }
+          }
+        }
+      },
+      "buttons" : {
+        "universalBackForward" : true
+      },
+      "pointer" : {
+        "speed" : 0.0689655172413792768,
+        "disableAcceleration" : false,
+        "acceleration" : 0.6875
+      }
+    },
+    {
+      "if" : {
+        "app" : "com.todesktop.230313mzl4w4u92",
+        "device" : {
+          "productName" : "HyperX Pulsefire Haste 2 Wireless",
+          "vendorID" : "0x3f0",
+          "category" : "mouse",
+          "productID" : "0xd97"
+        }
+      },
+      "scrolling" : {
+        "modifiers" : {
+          "vertical" : {
+            "command" : {
+              "type" : "auto"
+            }
+          }
+        }
+      }
+    },
+    {
+      "if" : {
+        "device" : {
+          "productID" : "0xf98",
+          "productName" : "HyperX Pulsefire Haste 2 Wireless",
+          "category" : "mouse",
+          "vendorID" : "0x3f0"
+        }
+      },
+      "scrolling" : {
+        "speed" : {
+          "vertical" : 0
+        },
+        "modifiers" : {
+          "vertical" : {
+            "control" : {
+              "type" : "preventDefault"
+            },
+            "option" : {
+              "type" : "pinchZoom"
+            },
+            "command" : {
+              "type" : "zoom"
+            },
+            "shift" : {
+              "type" : "alterOrientation"
+            }
+          }
+        },
+        "acceleration" : {
+          "vertical" : 1
+        },
+        "reverse" : {
+          "vertical" : true
+        },
+        "distance" : {
+          "vertical" : 3
+        }
+      },
+      "pointer" : {
+        "speed" : 0.055,
+        "acceleration" : 0.5,
+        "disableAcceleration" : false
+      }
+    },
+    {
+      "if" : {
+        "device" : {
+          "vendorID" : "0x3f0",
+          "productID" : "0xf98",
+          "category" : "mouse",
+          "productName" : "HyperX Pulsefire Haste 2 Wireless"
+        },
+        "app" : "com.codeweavers.CrossOver"
+      },
+      "pointer" : {
+        "speed" : 0.0689655172413792768,
+        "disableAcceleration" : false,
+        "acceleration" : 0.6875
+      }
+    },
+    {
+      "if" : {
+        "device" : {
+          "productName" : "HyperX Pulsefire Haste 2 Wireless",
+          "productID" : "0xf98",
+          "vendorID" : "0x3f0",
+          "category" : "mouse"
+        },
+        "app" : "com.vivaldi.Vivaldi"
+      },
+      "scrolling" : {
+        "speed" : {
+          "vertical" : 0
+        },
+        "modifiers" : {
+          "vertical" : {
+            "command" : {
+              "type" : "auto"
+            },
+            "shift" : {
+              "type" : "ignore"
+            },
+            "option" : {
+              "type" : "pinchZoom"
+            },
+            "control" : {
+              "type" : "preventDefault"
+            }
+          }
+        },
+        "acceleration" : {
+          "vertical" : 1
+        },
+        "distance" : {
+          "vertical" : 3
+        }
+      }
+    },
+    {
+      "if" : {
+        "device" : {
+          "productName" : "Apple Internal Keyboard \/ Trackpad",
+          "vendorID" : "0x0",
+          "productID" : "0x0",
+          "category" : "trackpad"
+        }
+      },
+      "scrolling" : {
+        "acceleration" : {
+          "vertical" : 1
+        }
+      },
+      "pointer" : {
+        "speed" : 0.0689655172413792768,
+        "disableAcceleration" : false,
+        "acceleration" : 0.6875
+      }
+    },
+    {
+      "if" : {
+        "device" : {
+          "productID" : "0x0",
+          "category" : "trackpad",
+          "vendorID" : "0x0",
+          "productName" : "Apple Internal Keyboard \/ Trackpad"
+        },
+        "app" : "com.lujjjh.LinearMouse"
+      },
+      "scrolling" : {
+        "acceleration" : {
+          "vertical" : 1
+        }
+      }
+    },
+    {
+      "if" : {
+        "device" : {
+          "productID" : "0x2006",
+          "serialNumber" : "44185CA30594",
+          "category" : "mouse",
+          "vendorID" : "0x3662",
+          "productName" : "Wireless Gaming Mouse V3"
+        }
+      },
+      "scrolling" : {
+        "acceleration" : {
+          "vertical" : 1
+        },
+        "speed" : {
+          "vertical" : 0
+        },
+        "reverse" : {
+          "vertical" : true
+        },
+        "modifiers" : {
+          "vertical" : {
+            "command" : {
+              "type" : "zoom"
+            },
+            "shift" : {
+              "type" : "auto"
+            },
+            "control" : {
+              "type" : "pinchZoom"
+            },
+            "option" : {
+              "type" : "auto"
+            }
+          }
+        },
+        "distance" : {
+          "vertical" : 3
+        }
+      },
+      "buttons" : {
+        "universalBackForward" : true
+      },
+      "pointer" : {
+        "speed" : 0.075,
+        "disableAcceleration" : false,
+        "acceleration" : 0.35
+      }
+    },
+    {
+      "if" : {
+        "device" : {
+          "productID" : "0x2006",
+          "category" : "mouse",
+          "vendorID" : "0x3662",
+          "serialNumber" : "44185CA30594",
+          "productName" : "Wireless Gaming Mouse V3"
+        },
+        "app" : "com.vivaldi.Vivaldi"
+      },
+      "scrolling" : {
+        "modifiers" : {
+          "vertical" : {
+            "shift" : {
+              "type" : "auto"
+            },
+            "control" : {
+              "type" : "pinchZoom"
+            },
+            "command" : {
+              "type" : "auto"
+            },
+            "option" : {
+              "type" : "auto"
+            }
+          }
+        },
+        "reverse" : {
+          "vertical" : true
+        }
+      }
+    },
+    {
+      "if" : {
+        "app" : "com.todesktop.230313mzl4w4u92",
+        "device" : {
+          "productName" : "Wireless Gaming Mouse V3",
+          "category" : "mouse",
+          "serialNumber" : "44185CA30594",
+          "vendorID" : "0x3662",
+          "productID" : "0x2006"
+        }
+      },
+      "scrolling" : {
+        "distance" : {
+          "vertical" : 1
+        },
+        "modifiers" : {
+          "vertical" : {
+            "option" : {
+              "type" : "auto"
+            },
+            "control" : {
+              "type" : "pinchZoom"
+            },
+            "command" : {
+              "type" : "auto"
+            },
+            "shift" : {
+              "type" : "auto"
+            }
+          }
+        }
+      }
+    },
+    {
+      "if" : {
+        "device" : {
+          "vendorID" : "0x3662",
+          "serialNumber" : "44185CA30594",
+          "category" : "mouse",
+          "productID" : "0x2006",
+          "productName" : "Wireless Gaming Mouse V3"
+        },
+        "app" : "com.philandro.anydesk"
+      },
+      "scrolling" : {
+        "distance" : {
+          "vertical" : "59.9px"
+        },
+        "acceleration" : {
+          "vertical" : 1
+        },
+        "speed" : {
+          "vertical" : 0
+        }
+      }
+    },
+    {
+      "if" : {
+        "app" : "com.colliderli.iina",
+        "device" : {
+          "category" : "mouse",
+          "productName" : "Wireless Gaming Mouse V3",
+          "serialNumber" : "44185CA30594",
+          "vendorID" : "0x3662",
+          "productID" : "0x2006"
+        }
+      },
+      "scrolling" : {
+        "modifiers" : {
+          "vertical" : {
+            "option" : {
+              "type" : "auto"
+            },
+            "command" : {
+              "type" : "auto"
+            },
+            "control" : {
+              "type" : "pinchZoom"
+            },
+            "shift" : {
+              "type" : "auto"
+            }
+          }
+        },
+        "reverse" : {
+          "vertical" : true
+        }
+      }
+    },
+    {
+      "if" : {
+        "device" : {
+          "category" : "mouse",
+          "vendorID" : "0x3662",
+          "productID" : "0x2006",
+          "productName" : "Wireless Gaming Mouse V3",
+          "serialNumber" : "44185CA30594"
+        },
+        "app" : "com.minttype.folders"
+      },
+      "scrolling" : {
+        "modifiers" : {
+          "vertical" : {
+            "command" : {
+              "type" : "auto"
+            },
+            "shift" : {
+              "type" : "auto"
+            },
+            "option" : {
+              "type" : "auto"
+            },
+            "control" : {
+              "type" : "pinchZoom"
+            }
+          }
+        }
+      }
+    },
+    {
+      "if" : {
+        "app" : "com.rogueamoeba.soundsource",
+        "device" : {
+          "productName" : "Wireless Gaming Mouse V3",
+          "vendorID" : "0x3662",
+          "category" : "mouse",
+          "productID" : "0x2006",
+          "serialNumber" : "44185CA30594"
+        }
+      },
+      "scrolling" : {
+        "reverse" : {
+          "vertical" : false
+        }
+      }
+    },
+    {
+      "if" : {
+        "device" : {
+          "category" : "mouse",
+          "productName" : "Wireless Gaming Mouse V3",
+          "serialNumber" : "44185CA30594",
+          "productID" : "0x2006",
+          "vendorID" : "0x3662"
+        },
+        "app" : "com.parallels.desktop.console"
+      },
+      "scrolling" : {
+        "modifiers" : {
+          "vertical" : {
+            "shift" : {
+              "type" : "auto"
+            },
+            "option" : {
+              "type" : "auto"
+            },
+            "control" : {
+              "type" : "auto"
+            },
+            "command" : {
+              "type" : "auto"
+            }
+          }
+        }
+      },
+      "buttons" : {
+        "universalBackForward" : false
+      }
+    },
+    {
+      "if" : {
+        "device" : {
+          "vendorID" : "0x3662",
+          "productID" : "0x2005",
+          "serialNumber" : "43E461A20594",
+          "productName" : "USB Gaming Mouse V3",
+          "category" : "mouse"
+        }
+      },
+      "scrolling" : {
+        "speed" : {
+          "vertical" : 0
+        },
+        "acceleration" : {
+          "vertical" : 1
+        },
+        "modifiers" : {
+          "vertical" : {
+            "shift" : {
+              "type" : "auto"
+            },
+            "option" : {
+              "type" : "auto"
+            },
+            "control" : {
+              "type" : "pinchZoom"
+            },
+            "command" : {
+              "type" : "zoom"
+            }
+          }
+        },
+        "reverse" : {
+          "vertical" : true
+        },
+        "distance" : {
+          "vertical" : 3
+        }
+      },
+      "buttons" : {
+        "universalBackForward" : true
+      }
+    },
+    {
+      "if" : {
+        "app" : "com.todesktop.230313mzl4w4u92",
+        "device" : {
+          "productID" : "0x2005",
+          "productName" : "USB Gaming Mouse V3",
+          "vendorID" : "0x3662",
+          "category" : "mouse",
+          "serialNumber" : "43E461A20594"
+        }
+      },
+      "scrolling" : {
+        "modifiers" : {
+          "vertical" : {
+            "shift" : {
+              "type" : "auto"
+            },
+            "control" : {
+              "type" : "pinchZoom"
+            },
+            "command" : {
+              "type" : "auto"
+            },
+            "option" : {
+              "type" : "auto"
+            }
+          }
+        }
+      }
+    },
+    {
+      "if" : {
+        "app" : "com.vivaldi.Vivaldi",
+        "device" : {
+          "serialNumber" : "43E461A20594",
+          "category" : "mouse",
+          "productID" : "0x2005",
+          "vendorID" : "0x3662",
+          "productName" : "USB Gaming Mouse V3"
+        }
+      },
+      "scrolling" : {
+        "modifiers" : {
+          "vertical" : {
+            "control" : {
+              "type" : "pinchZoom"
+            },
+            "shift" : {
+              "type" : "auto"
+            },
+            "option" : {
+              "type" : "auto"
+            },
+            "command" : {
+              "type" : "auto"
+            }
+          }
+        }
+      }
+    },
+    {
+      "if" : {
+        "app" : "com.microsoft.VSCode",
+        "device" : {
+          "productID" : "0x2005",
+          "serialNumber" : "43E461A20594",
+          "productName" : "USB Gaming Mouse V3",
+          "vendorID" : "0x3662",
+          "category" : "mouse"
+        }
+      },
+      "scrolling" : {
+        "modifiers" : {
+          "vertical" : {
+            "option" : {
+              "type" : "auto"
+            },
+            "command" : {
+              "type" : "auto"
+            },
+            "control" : {
+              "type" : "pinchZoom"
+            },
+            "shift" : {
+              "type" : "auto"
+            }
+          }
+        }
+      }
+    }
+  ],
+  "$schema" : "https:\/\/schema.linearmouse.app\/0.10.0"
+}

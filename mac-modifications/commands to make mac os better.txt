@@ -1,0 +1,6 @@
+Stop bouncing app icons on notifications in dock
+defaults write com.apple.dock no-bouncing -bool TRUE;
+
+Then restart dock
+killall Dock
+
