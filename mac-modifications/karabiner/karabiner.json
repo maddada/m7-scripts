@@ -10,11 +10,10 @@
                                 "from": {
                                     "key_code": "q",
                                     "modifiers": {
-                                        "mandatory": ["command", "shift"],
-                                        "optional": ["any"]
+                                        "mandatory": ["command", "shift"]
                                     }
                                 },
-                                "to": [{ "key_code": "vk_none" }],
+                                "to": [{ "key_code": "j", "modifiers": ["control", "option", "shift"] }],
                                 "type": "basic"
                             },
                             {
@@ -32,8 +31,7 @@
                             {
                                 "description": "Tap ` for backtick, hold ` for Super Key (Cmd+Ctrl+Opt+Shift)",
                                 "from": {
-                                    "key_code": "grave_accent_and_tilde",
-                                    "modifiers": { "optional": ["any"] }
+                                    "key_code": "grave_accent_and_tilde"
                                 },
                                 "parameters": {
                                     "basic.to_if_alone_timeout_milliseconds": 100,
@@ -63,8 +61,7 @@
                                 "from": {
                                     "key_code": "f",
                                     "modifiers": {
-                                        "mandatory": ["command", "shift"],
-                                        "optional": []
+                                        "mandatory": ["command", "shift"]
                                     }
                                 },
                                 "to": [
@@ -91,8 +88,7 @@
                                 "from": {
                                     "key_code": "h",
                                     "modifiers": {
-                                        "mandatory": ["command"],
-                                        "optional": []
+                                        "mandatory": ["command"]
                                     }
                                 },
                                 "to": [
@@ -118,14 +114,60 @@
                                 "from": {
                                     "key_code": "q",
                                     "modifiers": {
-                                        "mandatory": ["command"],
-                                        "optional": []
+                                        "mandatory": ["command"]
                                     }
                                 },
                                 "to": [
                                     {
                                         "key_code": "u",
                                         "modifiers": ["left_command", "left_shift", "left_option"]
+                                    }
+                                ],
+                                "type": "basic"
+                            }
+                        ]
+                    },
+                    {
+                        "description": "Remap Command+Tab to Command+Shift+] and Command+Shift+Tab to Command+Shift+[",
+                        "manipulators": [
+                            {
+                                "conditions": [
+                                    {
+                                        "bundle_identifiers": ["^com\\.philandro\\.anydesk$", "^com\\.microsoft\\.rdc\\.macos$", "^parallels$"],
+                                        "type": "frontmost_application_unless"
+                                    }
+                                ],
+                                "from": {
+                                    "key_code": "tab",
+                                    "modifiers": {
+                                        "mandatory": ["command"]
+                                    }
+                                },
+                                "to": [
+                                    {
+                                        "key_code": "close_bracket",
+                                        "modifiers": ["left_command", "left_shift"]
+                                    }
+                                ],
+                                "type": "basic"
+                            },
+                            {
+                                "conditions": [
+                                    {
+                                        "bundle_identifiers": ["^com\\.philandro\\.anydesk$", "^com\\.microsoft\\.rdc\\.macos$", "^parallels$"],
+                                        "type": "frontmost_application_unless"
+                                    }
+                                ],
+                                "from": {
+                                    "key_code": "tab",
+                                    "modifiers": {
+                                        "mandatory": ["command", "shift"]
+                                    }
+                                },
+                                "to": [
+                                    {
+                                        "key_code": "open_bracket",
+                                        "modifiers": ["left_command", "left_shift"]
                                     }
                                 ],
                                 "type": "basic"
@@ -145,8 +187,7 @@
                                 "from": {
                                     "key_code": "tab",
                                     "modifiers": {
-                                        "mandatory": ["command"],
-                                        "optional": []
+                                        "mandatory": ["command"]
                                     }
                                 },
                                 "to": [
@@ -173,8 +214,7 @@
                                 "from": {
                                     "key_code": "delete_or_backspace",
                                     "modifiers": {
-                                        "mandatory": ["command"],
-                                        "optional": ["any"]
+                                        "mandatory": ["command"]
                                     }
                                 },
                                 "to": [
@@ -196,8 +236,7 @@
                                 "from": {
                                     "key_code": "delete_forward",
                                     "modifiers": {
-                                        "mandatory": ["command"],
-                                        "optional": ["any"]
+                                        "mandatory": ["command"]
                                     }
                                 },
                                 "to": [
@@ -223,8 +262,7 @@
                                 "from": {
                                     "key_code": "left_arrow",
                                     "modifiers": {
-                                        "mandatory": ["option"],
-                                        "optional": ["any"]
+                                        "mandatory": ["option"]
                                     }
                                 },
                                 "to": [
@@ -245,8 +283,7 @@
                                 "from": {
                                     "key_code": "right_arrow",
                                     "modifiers": {
-                                        "mandatory": ["option"],
-                                        "optional": ["any"]
+                                        "mandatory": ["option"]
                                     }
                                 },
                                 "to": [
@@ -267,8 +304,7 @@
                                 "from": {
                                     "key_code": "left_arrow",
                                     "modifiers": {
-                                        "mandatory": ["option", "shift"],
-                                        "optional": ["any"]
+                                        "mandatory": ["option", "shift"]
                                     }
                                 },
                                 "to": [
@@ -289,8 +325,7 @@
                                 "from": {
                                     "key_code": "right_arrow",
                                     "modifiers": {
-                                        "mandatory": ["option", "shift"],
-                                        "optional": ["any"]
+                                        "mandatory": ["option", "shift"]
                                     }
                                 },
                                 "to": [
@@ -316,8 +351,7 @@
                                 "from": {
                                     "key_code": "left_arrow",
                                     "modifiers": {
-                                        "mandatory": ["command"],
-                                        "optional": ["any"]
+                                        "mandatory": ["command"]
                                     }
                                 },
                                 "to": [
@@ -338,8 +372,7 @@
                                 "from": {
                                     "key_code": "right_arrow",
                                     "modifiers": {
-                                        "mandatory": ["command"],
-                                        "optional": ["any"]
+                                        "mandatory": ["command"]
                                     }
                                 },
                                 "to": [
@@ -360,8 +393,7 @@
                                 "from": {
                                     "key_code": "left_arrow",
                                     "modifiers": {
-                                        "mandatory": ["command", "shift"],
-                                        "optional": ["any"]
+                                        "mandatory": ["command", "shift"]
                                     }
                                 },
                                 "to": [
@@ -382,8 +414,7 @@
                                 "from": {
                                     "key_code": "right_arrow",
                                     "modifiers": {
-                                        "mandatory": ["command", "shift"],
-                                        "optional": ["any"]
+                                        "mandatory": ["command", "shift"]
                                     }
                                 },
                                 "to": [
@@ -509,8 +540,7 @@
                                 "from": {
                                     "key_code": "home",
                                     "modifiers": {
-                                        "mandatory": ["shift"],
-                                        "optional": ["any"]
+                                        "mandatory": ["shift"]
                                     }
                                 },
                                 "to": [
@@ -550,8 +580,7 @@
                                 "from": {
                                     "key_code": "end",
                                     "modifiers": {
-                                        "mandatory": ["shift"],
-                                        "optional": ["any"]
+                                        "mandatory": ["shift"]
                                     }
                                 },
                                 "to": [
@@ -560,6 +589,21 @@
                                         "modifiers": ["command", "shift"]
                                     }
                                 ],
+                                "type": "basic"
+                            }
+                        ]
+                    },
+                    {
+                        "description": "Alt + G types 'c87xrCK93d0FFam5fs'",
+                        "manipulators": [
+                            {
+                                "from": {
+                                    "key_code": "g",
+                                    "modifiers": {
+                                        "mandatory": ["option"]
+                                    }
+                                },
+                                "to": [{ "key_code": "c" }, { "key_code": "8" }, { "key_code": "7" }, { "key_code": "x" }, { "key_code": "r" }, { "key_code": "c", "modifiers": ["shift"] }, { "key_code": "k", "modifiers": ["shift"] }, { "key_code": "9" }, { "key_code": "3" }, { "key_code": "d" }, { "key_code": "0" }, { "key_code": "f", "modifiers": ["shift"] }, { "key_code": "f", "modifiers": ["shift"] }, { "key_code": "a" }, { "key_code": "m" }, { "key_code": "5" }, { "key_code": "f" }, { "key_code": "s" }],
                                 "type": "basic"
                             }
                         ]
