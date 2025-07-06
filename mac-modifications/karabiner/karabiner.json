@@ -9,11 +9,14 @@
                             {
                                 "from": {
                                     "key_code": "q",
-                                    "modifiers": {
-                                        "mandatory": ["command", "shift"]
-                                    }
+                                    "modifiers": { "mandatory": ["command", "shift"] }
                                 },
-                                "to": [{ "key_code": "j", "modifiers": ["control", "option", "shift"] }],
+                                "to": [
+                                    {
+                                        "key_code": "j",
+                                        "modifiers": ["control", "option", "shift"]
+                                    }
+                                ],
                                 "type": "basic"
                             },
                             {
@@ -30,9 +33,7 @@
                         "manipulators": [
                             {
                                 "description": "Tap ` for backtick, hold ` for Super Key (Cmd+Ctrl+Opt+Shift)",
-                                "from": {
-                                    "key_code": "grave_accent_and_tilde"
-                                },
+                                "from": { "key_code": "grave_accent_and_tilde" },
                                 "parameters": {
                                     "basic.to_if_alone_timeout_milliseconds": 100,
                                     "basic.to_if_held_down_threshold_milliseconds": 100
@@ -54,15 +55,15 @@
                             {
                                 "conditions": [
                                     {
-                                        "bundle_identifiers": ["^com\\.parallels\\.desktop\\.console$"],
+                                        "bundle_identifiers": [
+                                            "^com\\.parallels\\.desktop\\.console$"
+                                        ],
                                         "type": "frontmost_application_if"
                                     }
                                 ],
                                 "from": {
                                     "key_code": "f",
-                                    "modifiers": {
-                                        "mandatory": ["command", "shift"]
-                                    }
+                                    "modifiers": { "mandatory": ["command", "shift"] }
                                 },
                                 "to": [
                                     { "shell_command": "echo \"[$(date '+%Y-%m-%d %H:%M:%S').$(( $(date '+%N') / 1000000 ))] [info] [console_user_server] Command+Shift+F remapped to Command+Option+Shift+F in Parallels.\" >> ~/.local/share/karabiner/log/console_user_server.log" },
@@ -81,15 +82,17 @@
                             {
                                 "conditions": [
                                     {
-                                        "bundle_identifiers": ["^com\\.philandro\\.anydesk$", "^com\\.microsoft\\.rdc\\.macos$", "^parallels$"],
+                                        "bundle_identifiers": [
+                                            "^com\\.philandro\\.anydesk$",
+                                            "^com\\.microsoft\\.rdc\\.macos$",
+                                            "^parallels$"
+                                        ],
                                         "type": "frontmost_application_if"
                                     }
                                 ],
                                 "from": {
                                     "key_code": "h",
-                                    "modifiers": {
-                                        "mandatory": ["command"]
-                                    }
+                                    "modifiers": { "mandatory": ["command"] }
                                 },
                                 "to": [
                                     {
@@ -107,15 +110,17 @@
                             {
                                 "conditions": [
                                     {
-                                        "bundle_identifiers": ["^com\\.philandro\\.anydesk$", "^com\\.microsoft\\.rdc\\.macos$", "^parallels$"],
+                                        "bundle_identifiers": [
+                                            "^com\\.philandro\\.anydesk$",
+                                            "^com\\.microsoft\\.rdc\\.macos$",
+                                            "^parallels$"
+                                        ],
                                         "type": "frontmost_application_unless"
                                     }
                                 ],
                                 "from": {
                                     "key_code": "q",
-                                    "modifiers": {
-                                        "mandatory": ["command"]
-                                    }
+                                    "modifiers": { "mandatory": ["command"] }
                                 },
                                 "to": [
                                     {
@@ -133,15 +138,17 @@
                             {
                                 "conditions": [
                                     {
-                                        "bundle_identifiers": ["^com\\.philandro\\.anydesk$", "^com\\.microsoft\\.rdc\\.macos$", "^parallels$"],
+                                        "bundle_identifiers": [
+                                            "^com\\.philandro\\.anydesk$",
+                                            "^com\\.microsoft\\.rdc\\.macos$",
+                                            "^parallels$"
+                                        ],
                                         "type": "frontmost_application_unless"
                                     }
                                 ],
                                 "from": {
                                     "key_code": "tab",
-                                    "modifiers": {
-                                        "mandatory": ["command"]
-                                    }
+                                    "modifiers": { "mandatory": ["command"] }
                                 },
                                 "to": [
                                     {
@@ -154,15 +161,17 @@
                             {
                                 "conditions": [
                                     {
-                                        "bundle_identifiers": ["^com\\.philandro\\.anydesk$", "^com\\.microsoft\\.rdc\\.macos$", "^parallels$"],
+                                        "bundle_identifiers": [
+                                            "^com\\.philandro\\.anydesk$",
+                                            "^com\\.microsoft\\.rdc\\.macos$",
+                                            "^parallels$"
+                                        ],
                                         "type": "frontmost_application_unless"
                                     }
                                 ],
                                 "from": {
                                     "key_code": "tab",
-                                    "modifiers": {
-                                        "mandatory": ["command", "shift"]
-                                    }
+                                    "modifiers": { "mandatory": ["command", "shift"] }
                                 },
                                 "to": [
                                     {
@@ -180,15 +189,17 @@
                             {
                                 "conditions": [
                                     {
-                                        "bundle_identifiers": ["^com\\.philandro\\.anydesk$", "^com\\.microsoft\\.rdc\\.macos$", "^parallels$"],
+                                        "bundle_identifiers": [
+                                            "^com\\.philandro\\.anydesk$",
+                                            "^com\\.microsoft\\.rdc\\.macos$",
+                                            "^parallels$"
+                                        ],
                                         "type": "frontmost_application_unless"
                                     }
                                 ],
                                 "from": {
                                     "key_code": "tab",
-                                    "modifiers": {
-                                        "mandatory": ["command"]
-                                    }
+                                    "modifiers": { "mandatory": ["command"] }
                                 },
                                 "to": [
                                     {
@@ -206,16 +217,18 @@
                             {
                                 "conditions": [
                                     {
-                                        "bundle_identifiers": ["^com\\.philandro\\.anydesk$", "^com\\.microsoft\\.rdc\\.macos$", "^parallels$"],
+                                        "bundle_identifiers": [
+                                            "^com\\.philandro\\.anydesk$",
+                                            "^com\\.microsoft\\.rdc\\.macos$",
+                                            "^parallels$"
+                                        ],
                                         "type": "frontmost_application_unless"
                                     }
                                 ],
                                 "description": "Cmd + Backspace -> Option + Backspace",
                                 "from": {
                                     "key_code": "delete_or_backspace",
-                                    "modifiers": {
-                                        "mandatory": ["command"]
-                                    }
+                                    "modifiers": { "mandatory": ["command"] }
                                 },
                                 "to": [
                                     {
@@ -228,16 +241,18 @@
                             {
                                 "conditions": [
                                     {
-                                        "bundle_identifiers": ["^com\\.philandro\\.anydesk$", "^com\\.microsoft\\.rdc\\.macos$", "^parallels$"],
+                                        "bundle_identifiers": [
+                                            "^com\\.philandro\\.anydesk$",
+                                            "^com\\.microsoft\\.rdc\\.macos$",
+                                            "^parallels$"
+                                        ],
                                         "type": "frontmost_application_unless"
                                     }
                                 ],
                                 "description": "Cmd + Forward Delete -> Option + Forward Delete",
                                 "from": {
                                     "key_code": "delete_forward",
-                                    "modifiers": {
-                                        "mandatory": ["command"]
-                                    }
+                                    "modifiers": { "mandatory": ["command"] }
                                 },
                                 "to": [
                                     {
@@ -255,15 +270,17 @@
                             {
                                 "conditions": [
                                     {
-                                        "bundle_identifiers": ["^com\\.philandro\\.anydesk$", "^com\\.microsoft\\.rdc\\.macos$", "^parallels$"],
+                                        "bundle_identifiers": [
+                                            "^com\\.philandro\\.anydesk$",
+                                            "^com\\.microsoft\\.rdc\\.macos$",
+                                            "^parallels$"
+                                        ],
                                         "type": "frontmost_application_unless"
                                     }
                                 ],
                                 "from": {
                                     "key_code": "left_arrow",
-                                    "modifiers": {
-                                        "mandatory": ["option"]
-                                    }
+                                    "modifiers": { "mandatory": ["option"] }
                                 },
                                 "to": [
                                     {
@@ -276,15 +293,17 @@
                             {
                                 "conditions": [
                                     {
-                                        "bundle_identifiers": ["^com\\.philandro\\.anydesk$", "^com\\.microsoft\\.rdc\\.macos$", "^parallels$"],
+                                        "bundle_identifiers": [
+                                            "^com\\.philandro\\.anydesk$",
+                                            "^com\\.microsoft\\.rdc\\.macos$",
+                                            "^parallels$"
+                                        ],
                                         "type": "frontmost_application_unless"
                                     }
                                 ],
                                 "from": {
                                     "key_code": "right_arrow",
-                                    "modifiers": {
-                                        "mandatory": ["option"]
-                                    }
+                                    "modifiers": { "mandatory": ["option"] }
                                 },
                                 "to": [
                                     {
@@ -297,15 +316,17 @@
                             {
                                 "conditions": [
                                     {
-                                        "bundle_identifiers": ["^com\\.philandro\\.anydesk$", "^com\\.microsoft\\.rdc\\.macos$", "^parallels$"],
+                                        "bundle_identifiers": [
+                                            "^com\\.philandro\\.anydesk$",
+                                            "^com\\.microsoft\\.rdc\\.macos$",
+                                            "^parallels$"
+                                        ],
                                         "type": "frontmost_application_unless"
                                     }
                                 ],
                                 "from": {
                                     "key_code": "left_arrow",
-                                    "modifiers": {
-                                        "mandatory": ["option", "shift"]
-                                    }
+                                    "modifiers": { "mandatory": ["option", "shift"] }
                                 },
                                 "to": [
                                     {
@@ -318,15 +339,17 @@
                             {
                                 "conditions": [
                                     {
-                                        "bundle_identifiers": ["^com\\.philandro\\.anydesk$", "^com\\.microsoft\\.rdc\\.macos$", "^parallels$"],
+                                        "bundle_identifiers": [
+                                            "^com\\.philandro\\.anydesk$",
+                                            "^com\\.microsoft\\.rdc\\.macos$",
+                                            "^parallels$"
+                                        ],
                                         "type": "frontmost_application_unless"
                                     }
                                 ],
                                 "from": {
                                     "key_code": "right_arrow",
-                                    "modifiers": {
-                                        "mandatory": ["option", "shift"]
-                                    }
+                                    "modifiers": { "mandatory": ["option", "shift"] }
                                 },
                                 "to": [
                                     {
@@ -344,15 +367,17 @@
                             {
                                 "conditions": [
                                     {
-                                        "bundle_identifiers": ["^com\\.philandro\\.anydesk$", "^com\\.microsoft\\.rdc\\.macos$", "^parallels$"],
+                                        "bundle_identifiers": [
+                                            "^com\\.philandro\\.anydesk$",
+                                            "^com\\.microsoft\\.rdc\\.macos$",
+                                            "^parallels$"
+                                        ],
                                         "type": "frontmost_application_unless"
                                     }
                                 ],
                                 "from": {
                                     "key_code": "left_arrow",
-                                    "modifiers": {
-                                        "mandatory": ["command"]
-                                    }
+                                    "modifiers": { "mandatory": ["command"] }
                                 },
                                 "to": [
                                     {
@@ -365,15 +390,17 @@
                             {
                                 "conditions": [
                                     {
-                                        "bundle_identifiers": ["^com\\.philandro\\.anydesk$", "^com\\.microsoft\\.rdc\\.macos$", "^parallels$"],
+                                        "bundle_identifiers": [
+                                            "^com\\.philandro\\.anydesk$",
+                                            "^com\\.microsoft\\.rdc\\.macos$",
+                                            "^parallels$"
+                                        ],
                                         "type": "frontmost_application_unless"
                                     }
                                 ],
                                 "from": {
                                     "key_code": "right_arrow",
-                                    "modifiers": {
-                                        "mandatory": ["command"]
-                                    }
+                                    "modifiers": { "mandatory": ["command"] }
                                 },
                                 "to": [
                                     {
@@ -386,15 +413,17 @@
                             {
                                 "conditions": [
                                     {
-                                        "bundle_identifiers": ["^com\\.philandro\\.anydesk$", "^com\\.microsoft\\.rdc\\.macos$", "^parallels$"],
+                                        "bundle_identifiers": [
+                                            "^com\\.philandro\\.anydesk$",
+                                            "^com\\.microsoft\\.rdc\\.macos$",
+                                            "^parallels$"
+                                        ],
                                         "type": "frontmost_application_unless"
                                     }
                                 ],
                                 "from": {
                                     "key_code": "left_arrow",
-                                    "modifiers": {
-                                        "mandatory": ["command", "shift"]
-                                    }
+                                    "modifiers": { "mandatory": ["command", "shift"] }
                                 },
                                 "to": [
                                     {
@@ -407,15 +436,17 @@
                             {
                                 "conditions": [
                                     {
-                                        "bundle_identifiers": ["^com\\.philandro\\.anydesk$", "^com\\.microsoft\\.rdc\\.macos$", "^parallels$"],
+                                        "bundle_identifiers": [
+                                            "^com\\.philandro\\.anydesk$",
+                                            "^com\\.microsoft\\.rdc\\.macos$",
+                                            "^parallels$"
+                                        ],
                                         "type": "frontmost_application_unless"
                                     }
                                 ],
                                 "from": {
                                     "key_code": "right_arrow",
-                                    "modifiers": {
-                                        "mandatory": ["command", "shift"]
-                                    }
+                                    "modifiers": { "mandatory": ["command", "shift"] }
                                 },
                                 "to": [
                                     {
@@ -433,7 +464,11 @@
                             {
                                 "conditions": [
                                     {
-                                        "bundle_identifiers": ["^com\\.philandro\\.anydesk$", "^com\\.microsoft\\.rdc\\.macos$", "^parallels$"],
+                                        "bundle_identifiers": [
+                                            "^com\\.philandro\\.anydesk$",
+                                            "^com\\.microsoft\\.rdc\\.macos$",
+                                            "^parallels$"
+                                        ],
                                         "type": "frontmost_application_if"
                                     }
                                 ],
@@ -452,7 +487,11 @@
                             {
                                 "conditions": [
                                     {
-                                        "bundle_identifiers": ["^com\\.philandro\\.anydesk$", "^com\\.microsoft\\.rdc\\.macos$", "^parallels$"],
+                                        "bundle_identifiers": [
+                                            "^com\\.philandro\\.anydesk$",
+                                            "^com\\.microsoft\\.rdc\\.macos$",
+                                            "^parallels$"
+                                        ],
                                         "type": "frontmost_application_if"
                                     }
                                 ],
@@ -471,7 +510,11 @@
                             {
                                 "conditions": [
                                     {
-                                        "bundle_identifiers": ["^com\\.philandro\\.anydesk$", "^com\\.microsoft\\.rdc\\.macos$", "^parallels$"],
+                                        "bundle_identifiers": [
+                                            "^com\\.philandro\\.anydesk$",
+                                            "^com\\.microsoft\\.rdc\\.macos$",
+                                            "^parallels$"
+                                        ],
                                         "type": "frontmost_application_if"
                                     }
                                 ],
@@ -490,7 +533,11 @@
                             {
                                 "conditions": [
                                     {
-                                        "bundle_identifiers": ["^com\\.philandro\\.anydesk$", "^com\\.microsoft\\.rdc\\.macos$", "^parallels$"],
+                                        "bundle_identifiers": [
+                                            "^com\\.philandro\\.anydesk$",
+                                            "^com\\.microsoft\\.rdc\\.macos$",
+                                            "^parallels$"
+                                        ],
                                         "type": "frontmost_application_if"
                                     }
                                 ],
@@ -514,7 +561,11 @@
                             {
                                 "conditions": [
                                     {
-                                        "bundle_identifiers": ["^com\\.philandro\\.anydesk$", "^com\\.microsoft\\.rdc\\.macos$", "^parallels$"],
+                                        "bundle_identifiers": [
+                                            "^com\\.philandro\\.anydesk$",
+                                            "^com\\.microsoft\\.rdc\\.macos$",
+                                            "^parallels$"
+                                        ],
                                         "type": "frontmost_application_unless"
                                     }
                                 ],
@@ -533,15 +584,17 @@
                             {
                                 "conditions": [
                                     {
-                                        "bundle_identifiers": ["^com\\.philandro\\.anydesk$", "^com\\.microsoft\\.rdc\\.macos$", "^parallels$"],
+                                        "bundle_identifiers": [
+                                            "^com\\.philandro\\.anydesk$",
+                                            "^com\\.microsoft\\.rdc\\.macos$",
+                                            "^parallels$"
+                                        ],
                                         "type": "frontmost_application_unless"
                                     }
                                 ],
                                 "from": {
                                     "key_code": "home",
-                                    "modifiers": {
-                                        "mandatory": ["shift"]
-                                    }
+                                    "modifiers": { "mandatory": ["shift"] }
                                 },
                                 "to": [
                                     {
@@ -554,7 +607,11 @@
                             {
                                 "conditions": [
                                     {
-                                        "bundle_identifiers": ["^com\\.philandro\\.anydesk$", "^com\\.microsoft\\.rdc\\.macos$", "^parallels$"],
+                                        "bundle_identifiers": [
+                                            "^com\\.philandro\\.anydesk$",
+                                            "^com\\.microsoft\\.rdc\\.macos$",
+                                            "^parallels$"
+                                        ],
                                         "type": "frontmost_application_unless"
                                     }
                                 ],
@@ -573,15 +630,17 @@
                             {
                                 "conditions": [
                                     {
-                                        "bundle_identifiers": ["^com\\.philandro\\.anydesk$", "^com\\.microsoft\\.rdc\\.macos$", "^parallels$"],
+                                        "bundle_identifiers": [
+                                            "^com\\.philandro\\.anydesk$",
+                                            "^com\\.microsoft\\.rdc\\.macos$",
+                                            "^parallels$"
+                                        ],
                                         "type": "frontmost_application_unless"
                                     }
                                 ],
                                 "from": {
                                     "key_code": "end",
-                                    "modifiers": {
-                                        "mandatory": ["shift"]
-                                    }
+                                    "modifiers": { "mandatory": ["shift"] }
                                 },
                                 "to": [
                                     {
@@ -594,16 +653,45 @@
                         ]
                     },
                     {
-                        "description": "Alt + G types 'c87xrCK93d0FFam5fs'",
+                        "description": "Alt + Shift + G types 'c87xrCK93d0FFam5fs'",
                         "manipulators": [
                             {
                                 "from": {
                                     "key_code": "g",
-                                    "modifiers": {
-                                        "mandatory": ["option"]
-                                    }
+                                    "modifiers": { "mandatory": ["option", "shift"] }
                                 },
-                                "to": [{ "key_code": "c" }, { "key_code": "8" }, { "key_code": "7" }, { "key_code": "x" }, { "key_code": "r" }, { "key_code": "c", "modifiers": ["shift"] }, { "key_code": "k", "modifiers": ["shift"] }, { "key_code": "9" }, { "key_code": "3" }, { "key_code": "d" }, { "key_code": "0" }, { "key_code": "f", "modifiers": ["shift"] }, { "key_code": "f", "modifiers": ["shift"] }, { "key_code": "a" }, { "key_code": "m" }, { "key_code": "5" }, { "key_code": "f" }, { "key_code": "s" }],
+                                "to": [
+                                    { "key_code": "c" },
+                                    { "key_code": "8" },
+                                    { "key_code": "7" },
+                                    { "key_code": "x" },
+                                    { "key_code": "r" },
+                                    {
+                                        "key_code": "c",
+                                        "modifiers": ["shift"]
+                                    },
+                                    {
+                                        "key_code": "k",
+                                        "modifiers": ["shift"]
+                                    },
+                                    { "key_code": "9" },
+                                    { "key_code": "3" },
+                                    { "key_code": "d" },
+                                    { "key_code": "0" },
+                                    {
+                                        "key_code": "f",
+                                        "modifiers": ["shift"]
+                                    },
+                                    {
+                                        "key_code": "f",
+                                        "modifiers": ["shift"]
+                                    },
+                                    { "key_code": "a" },
+                                    { "key_code": "m" },
+                                    { "key_code": "5" },
+                                    { "key_code": "f" },
+                                    { "key_code": "s" }
+                                ],
                                 "type": "basic"
                             }
                         ]
@@ -641,6 +729,10 @@
                         {
                             "from": { "apple_vendor_top_case_key_code": "keyboard_fn" },
                             "to": [{ "key_code": "left_command" }]
+                        },
+                        {
+                            "from": { "key_code": "application" },
+                            "to": [{ "apple_vendor_top_case_key_code": "keyboard_fn" }]
                         },
                         {
                             "from": { "key_code": "caps_lock" },
@@ -686,6 +778,10 @@
                     "ignore": false,
                     "simple_modifications": [
                         {
+                            "from": { "key_code": "application" },
+                            "to": [{ "apple_vendor_top_case_key_code": "keyboard_fn" }]
+                        },
+                        {
                             "from": { "key_code": "caps_lock" },
                             "to": [{ "key_code": "delete_forward" }]
                         },
@@ -710,6 +806,10 @@
                         "vendor_id": 5426
                     },
                     "simple_modifications": [
+                        {
+                            "from": { "key_code": "application" },
+                            "to": [{ "apple_vendor_top_case_key_code": "keyboard_fn" }]
+                        },
                         {
                             "from": { "key_code": "caps_lock" },
                             "to": [{ "key_code": "delete_forward" }]

@@ -6,7 +6,7 @@
 cd "$(dirname "$0")"
 
 # Vivaldi installation path
-INSTALL_PATH="/Applications/Vivaldi.app/Contents/Frameworks/Vivaldi Framework.framework/Versions/Current/Resources/vivaldi/"
+INSTALL_PATH="/Applications/Vivaldi Snapshot.app/Contents/Frameworks/Vivaldi Framework.framework/Versions/Current/Resources/vivaldi/"
 
 # No need to copy UserTheme folder, just setting vivaldi to load main.css from my customizations folder is better
 # echo "## 1- Copying UserTheme folder"
