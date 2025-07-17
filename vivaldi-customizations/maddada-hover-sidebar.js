@@ -1,7 +1,8 @@
 let intervalId;
 let expandTimeout;
 let collapseTimeout;
-
+// sudo /Users/madda/dev/m7-scripts/vivaldi-customizations/main.sh
+// sudo /Users/madda/dev/m7-scripts/vivaldi-customizations/main_snapshot.sh
 const sidebarStyles = `
     :root {
         --width-1: 300px;
@@ -39,6 +40,7 @@ const STATES = {
 };
 
 let currentState = STATES.OVERLAY;
+let previousState = null; // To remember state before going to pinned due to button clicks
 
 function addIconToSidebarButton(iconSVG, dataModValue = "true") {
     const toggleButton = document.querySelector("#panels #switch div.button-toolbar.toolbar-spacer-flexible");
@@ -58,8 +60,6 @@ function setState(newState, applyStyles, addEventListeners, removeEventListeners
     console.log("Setting state to:", newState);
     currentState = newState;
 
-    const pinIcon = `<svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="16" height="16" viewBox="27 27 200 200" style="shape-rendering:geometricPrecision; text-rendering:geometricPrecision; image-rendering:optimizeQuality; fill-rule:evenodd; clip-rule:evenodd" xmlns:xlink="http://www.w3.org/1999/xlink"><g><path style="opacity:0.973" fill="#fefffe" d="M 146.5,27.5 C 149.425,27.4598 152.091,28.2932 154.5,30C 178,53.5 201.5,77 225,100.5C 227.814,105.006 228.147,109.673 226,114.5C 217.167,123.333 208.333,132.167 199.5,141C 196.2,142.879 192.866,142.879 189.5,141C 187.65,138.982 185.65,137.149 183.5,135.5C 175.848,142.652 168.348,149.985 161,157.5C 161.728,165.782 162.228,174.116 162.5,182.5C 163.771,197.609 159.438,210.776 149.5,222C 145.634,224.12 141.967,223.786 138.5,221C 123.333,205.833 108.167,190.667 93,175.5C 76.1667,192.333 59.3333,209.167 42.5,226C 31.5126,229.343 27.3459,225.509 30,214.5C 47.014,197.653 63.8473,180.653 80.5,163.5C 65.5141,148.014 50.3474,132.681 35,117.5C 33.5432,114.634 33.2099,111.634 34,108.5C 40.8615,100.985 49.3615,96.485 59.5,95C 64.3258,94.4268 69.1592,93.9268 74,93.5C 82.2397,94.2405 90.4064,95.0738 98.5,96C 106.167,88.3333 113.833,80.6667 121.5,73C 118.96,70.7953 116.793,68.2953 115,65.5C 114.21,62.366 114.543,59.366 116,56.5C 125.784,46.211 135.95,36.5443 146.5,27.5 Z"/></g></svg>`;
-
     switch (newState) {
         case STATES.PINNED:
             // Disable hover functionality
@@ -67,7 +67,7 @@ function setState(newState, applyStyles, addEventListeners, removeEventListeners
             const styleElement = document.getElementById("vivaldi-sidebar-styles");
             if (styleElement) styleElement.remove();
             panelsContainer.classList.remove("panel-expanded");
-            addIconToSidebarButton(pinIcon);
+            addIconToSidebarButton(`⏺︎`);
             console.log("State: PINNED");
             break;
 
@@ -114,6 +114,57 @@ function handleMiddleClick(setState, applyStyles, addEventListeners, removeEvent
     }
 }
 
+function handleSidebarButtonClick(button, setState, applyStyles, addEventListeners, removeEventListeners, panelsContainer, hiddenSidebarWidth, iconSidebarWidth) {
+    console.log("Sidebar button clicked:", button);
+
+    const isSharpTabsButton = button.matches(`button[aria-label="Sharp Tabs"]`);
+    const isActiveSharpTabsButton = isSharpTabsButton && button.closest(".button-toolbar.active");
+
+    if (isSharpTabsButton) {
+        if (isActiveSharpTabsButton) {
+            console.log("Active Sharp Tabs button clicked, restoring to previous state:", previousState);
+            // If clicking active Sharp Tabs button, restore to previous state
+            if (previousState && previousState !== currentState) {
+                setState(previousState, applyStyles, addEventListeners, removeEventListeners, panelsContainer, hiddenSidebarWidth, iconSidebarWidth);
+                previousState = null; // Clear the saved state
+            }
+        } else {
+            console.log("Inactive Sharp Tabs button clicked, doing nothing");
+            // If clicking inactive Sharp Tabs button, do nothing
+        }
+    } else {
+        console.log("Non-Sharp Tabs button clicked, saving current state and going to pinned");
+        // If clicking any other button, always save current state (even if already pinned) and ensure we're in pinned state
+        previousState = currentState;
+        console.log("Saved previous state:", previousState);
+        // Only call setState if we're not already in pinned state to avoid unnecessary operations
+        if (currentState !== STATES.PINNED) {
+            setState(STATES.PINNED, applyStyles, addEventListeners, removeEventListeners, panelsContainer, hiddenSidebarWidth, iconSidebarWidth);
+        }
+    }
+}
+
+function addSidebarButtonListeners(setState, applyStyles, addEventListeners, removeEventListeners, panelsContainer, hiddenSidebarWidth, iconSidebarWidth) {
+    console.log("Adding sidebar button listeners");
+
+    // Add event listeners to all buttons in the sidebar
+    const sidebarButtons = document.querySelectorAll("#panels .button-toolbar button");
+    console.log("Found sidebar buttons:", sidebarButtons.length);
+
+    sidebarButtons.forEach((button) => {
+        // Remove existing listeners to prevent duplicates
+        button.removeEventListener("click", button._sidebarClickHandler);
+
+        // Create new handler and store reference for later removal
+        button._sidebarClickHandler = (e) => {
+            handleSidebarButtonClick(button, setState, applyStyles, addEventListeners, removeEventListeners, panelsContainer, hiddenSidebarWidth, iconSidebarWidth);
+        };
+
+        button.addEventListener("click", button._sidebarClickHandler);
+        console.log("Added click listener to button:", button.getAttribute("aria-label") || button.textContent || "unnamed");
+    });
+}
+
 function handleMouseEnter(panelsContainer) {
     console.log("Mouse enter event triggered, current state:", currentState);
     if (currentState === STATES.PINNED) return;
@@ -123,6 +174,13 @@ function handleMouseEnter(panelsContainer) {
         clearTimeout(collapseTimeout);
         collapseTimeout = null;
         console.log("Cleared collapse timeout");
+    }
+
+    // Check if there's no active button - if so, don't expand the sidebar
+    const activeButton = document.querySelector(`.button-toolbar.active > button[aria-label="Sharp Tabs"]`);
+    if (!activeButton) {
+        console.log("No active button found, skipping expansion");
+        return;
     }
 
     // If already expanded, don't set a new timeout
@@ -224,13 +282,20 @@ function initHoverSidebar() {
 
         function applyStyles(currentSidebarWidth) {
             console.log("Applying styles with width:", currentSidebarWidth);
+
+            // Check if there's an active button - if not, set width to 0
+            const activeButton = document.querySelector(".button-toolbar.active > button[aria-label='Sharp Tabs']");
+            const actualWidth = activeButton ? currentSidebarWidth : "34px";
+
+            console.log("Active button found:", !!activeButton, "Using width:", actualWidth);
+
             const existingStyleElement = document.getElementById("vivaldi-sidebar-styles");
             if (existingStyleElement) {
                 existingStyleElement.remove();
             }
             const styleElement = document.createElement("style");
             styleElement.id = "vivaldi-sidebar-styles";
-            styleElement.textContent = sidebarStyles.replace("{currentSidebarWidth}", currentSidebarWidth);
+            styleElement.textContent = sidebarStyles.replace("{currentSidebarWidth}", actualWidth);
             document.head.appendChild(styleElement);
             console.log("Styles applied successfully");
         }
@@ -263,6 +328,64 @@ function initHoverSidebar() {
         console.log("Starting initial setup");
         setStateFn(STATES.OVERLAY);
         waitForToggleElement(handleLeftClickFn, handleMiddleClickFn);
+
+        // Watch for changes in active button state to update width dynamically
+        const buttonObserver = new MutationObserver((mutations) => {
+            let shouldReapplyStyles = false;
+            let shouldReaddButtonListeners = false;
+
+            mutations.forEach((mutation) => {
+                if (mutation.type === "attributes" && mutation.attributeName === "class") {
+                    const target = mutation.target;
+                    if (target.classList.contains("button-toolbar")) {
+                        shouldReapplyStyles = true;
+                    }
+                }
+
+                // Check if new buttons were added
+                if (mutation.type === "childList") {
+                    const addedNodes = Array.from(mutation.addedNodes);
+                    const hasNewButtons = addedNodes.some((node) => node.nodeType === Node.ELEMENT_NODE && (node.matches("button") || node.querySelector("button")));
+                    if (hasNewButtons) {
+                        shouldReaddButtonListeners = true;
+                    }
+                }
+            });
+
+            if (shouldReapplyStyles) {
+                console.log("Button state changed, reapplying styles");
+                // Only reapply styles if not in pinned state
+                if (currentState !== STATES.PINNED) {
+                    const currentWidth = currentState === STATES.HIDDEN ? hiddenSidebarWidth : iconSidebarWidth;
+                    applyStyles(currentWidth);
+                } else {
+                    console.log("In pinned state, not applying styles");
+                }
+            }
+
+            if (shouldReaddButtonListeners) {
+                console.log("New buttons detected, re-adding button listeners");
+                setTimeout(() => {
+                    addSidebarButtonListeners(setStateFn, applyStyles, addEventListenersFn, removeEventListenersFn, panelsContainer, hiddenSidebarWidth, iconSidebarWidth);
+                }, 100); // Small delay to ensure DOM is fully updated
+            }
+        });
+
+        // Observe the panels container for button state changes and new buttons
+        const panelsElement = document.getElementById("panels");
+        if (panelsElement) {
+            buttonObserver.observe(panelsElement, {
+                attributes: true,
+                attributeFilter: ["class"],
+                childList: true,
+                subtree: true,
+            });
+            console.log("Button state observer started");
+        }
+
+        // Add listeners for sidebar buttons
+        addSidebarButtonListeners(setStateFn, applyStyles, addEventListenersFn, removeEventListenersFn, panelsContainer, hiddenSidebarWidth, iconSidebarWidth);
+
         console.log("Initial setup complete");
 
         setInterval(initHoverSidebar, 5000);
