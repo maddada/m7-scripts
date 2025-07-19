@@ -1,336 +1,368 @@
-let intervalId;
-let expandTimeout;
-let collapseTimeout;
-// sudo /Users/madda/dev/m7-scripts/vivaldi-customizations/main.sh
-// sudo /Users/madda/dev/m7-scripts/vivaldi-customizations/main_snapshot.sh
-const sidebarStyles = `
-    :root {
-        --width-1: 300px;
-        --width-minimized: {currentSidebarWidth};
-        --width-hovered: 260px;
+(function () {
+    ("use strict");
+
+    // State constants
+    const SIDEPANEL_STATES = {
+        PINNED: "pinned",
+        OVERLAY: "overlay",
+        HIDDEN: "hidden",
+    };
+
+    // State management
+    let currentState = SIDEPANEL_STATES.OVERLAY;
+    let previousState = null;
+    let stateBeforeHidingVivaldiPanel = null;
+
+    // Timeouts
+    let expandTimeout = null;
+    let collapseTimeout = null;
+
+    // DOM elements
+    let panelsContainer = null;
+    let toggleButton = null;
+
+    // Observers
+    let buttonObserver = null;
+    let toggleObserver = null;
+    let panelObserver = null;
+
+    // Configuration
+    const config = {
+        hiddenWidth: "34px",
+        iconWidth: "72px",
+        expandedWidth: "260px",
+        fullWidth: "300px",
+        expandDelay: 20,
+        collapseDelay: 200,
+        initCheckInterval: 800,
+        reinitInterval: 5000,
+    };
+
+    // === INITIALIZATION ===
+    function init() {
+        console.log("Interval check running");
+
+        panelsContainer = document.getElementById("panels-container");
+        toggleButton = document.querySelector("#panels #switch div.button-toolbar.toolbar-spacer-flexible");
+
+        if (!panelsContainer) {
+            return false;
+        }
+
+        if (isAlreadyInitialized()) {
+            console.log("Already loaded, skipping initialization");
+            return true;
+        }
+
+        console.log("Found panels-container, initializing");
+        updateVivaldiPanelWidth();
+        markAsInitialized();
+        setupToggleButton();
+        setupButtonObserver();
+        setupPanelWidthObserver();
+        addSidebarButtonListeners();
+
+        return true;
     }
-    #panels-container.panel-expanded {
-        width: var(--width-1) !important;
+
+    function isAlreadyInitialized() {
+        return panelsContainer.getAttribute("data-mod-applied") === "true" && toggleButton?.getAttribute("data-mod-applied") === "true";
     }
-    #webview-container {
-        padding-left: var(--width-minimized) !important;
+
+    function markAsInitialized() {
+        panelsContainer.setAttribute("data-mod-applied", "true");
     }
-    #panels-container:not(.panel-expanded) {
-        width: var(--width-minimized) !important;
+
+    // === STATE MANAGEMENT ===
+    function setState(newState) {
+        console.log("Setting state to:", newState);
+        currentState = newState;
+
+        switch (newState) {
+            case SIDEPANEL_STATES.PINNED:
+                removeEventListeners();
+                removeStyles();
+                panelsContainer.classList.remove("panel-expanded");
+                addIconToToggleButton("⏺︎");
+                console.log("State: PINNED");
+                break;
+
+            case SIDEPANEL_STATES.OVERLAY:
+                applyStyles(config.iconWidth);
+                addEventListeners();
+                addIconToToggleButton("▶︎");
+                console.log("State: OVERLAY");
+                break;
+
+            case SIDEPANEL_STATES.HIDDEN:
+                applyStyles(config.hiddenWidth);
+                addEventListeners();
+                addIconToToggleButton("◁");
+                console.log("State: HIDDEN");
+                break;
+        }
     }
-    #panels-container {
-        position: absolute !important;
-        height: calc(100vh - 83px) !important;
-        transition: width 0.1s ease-in-out !important;
-    }
-    .panel-collapse-guard {
-        min-width: var(--width-minimized) !important;
-        max-width: var(--width-hovered) !important;
-    }
-    #panels-container.panel-expanded {
-        width: var(--width-hovered) !important;
-    }
-`;
 
-// State management
-const STATES = {
-    PINNED: "pinned",
-    OVERLAY: "overlay",
-    HIDDEN: "hidden",
-};
+    // === STYLES ===
+    function applyStyles(sidebarWidth) {
+        console.log("Applying styles with width:", sidebarWidth);
 
-let currentState = STATES.OVERLAY;
-let previousState = null; // To remember state before going to pinned due to button clicks
+        const activeButton = getActiveSharpTabsButton();
+        const actualWidth = activeButton ? sidebarWidth : config.hiddenWidth;
 
-function addIconToSidebarButton(iconSVG, dataModValue = "true") {
-    const toggleButton = document.querySelector("#panels #switch div.button-toolbar.toolbar-spacer-flexible");
-    const svgContainer = document.createElement("div");
-    svgContainer.style.cssText = "display: flex; flex-direction: column; align-items: center; height: 100%;";
-    const svgElement = document.createElement("div");
-    svgElement.innerHTML = iconSVG;
-    svgElement.style.cssText = "margin-top: 0; margin-bottom: auto;";
-    svgContainer.appendChild(svgElement);
-    toggleButton.style = "padding-top: 5px;";
-    toggleButton.innerHTML = "";
-    toggleButton.appendChild(svgContainer);
-    toggleButton.setAttribute("data-mod-applied", dataModValue);
-}
+        console.log("Active button found:", !!activeButton, "Using width:", actualWidth);
 
-function setState(newState, applyStyles, addEventListeners, removeEventListeners, panelsContainer, hiddenSidebarWidth, iconSidebarWidth) {
-    console.log("Setting state to:", newState);
-    currentState = newState;
+        removeStyles();
 
-    switch (newState) {
-        case STATES.PINNED:
-            // Disable hover functionality
-            removeEventListeners();
-            const styleElement = document.getElementById("vivaldi-sidebar-styles");
-            if (styleElement) styleElement.remove();
-            panelsContainer.classList.remove("panel-expanded");
-            addIconToSidebarButton(`⏺︎`);
-            console.log("State: PINNED");
-            break;
-
-        case STATES.OVERLAY:
-            // Enable hover with overlay width
-            applyStyles(iconSidebarWidth);
-            addEventListeners();
-            addIconToSidebarButton(`▶︎`);
-            console.log("State: OVERLAY");
-            break;
-
-        case STATES.HIDDEN:
-            // Enable hover with hidden width
-            applyStyles(hiddenSidebarWidth);
-            addEventListeners();
-            addIconToSidebarButton(`◁`);
-            console.log("State: HIDDEN");
-            break;
-    }
-}
-
-function handleLeftClick(setState, applyStyles, addEventListeners, removeEventListeners, panelsContainer, hiddenSidebarWidth, iconSidebarWidth) {
-    console.log("Left click - current state:", currentState);
-
-    if (currentState === STATES.PINNED) {
-        setState(STATES.OVERLAY, applyStyles, addEventListeners, removeEventListeners, panelsContainer, hiddenSidebarWidth, iconSidebarWidth);
-    } else if (currentState === STATES.OVERLAY) {
-        setState(STATES.PINNED, applyStyles, addEventListeners, removeEventListeners, panelsContainer, hiddenSidebarWidth, iconSidebarWidth);
-    } else if (currentState === STATES.HIDDEN) {
-        // If somehow in hidden state, go to pinned when left clicking
-        setState(STATES.PINNED, applyStyles, addEventListeners, removeEventListeners, panelsContainer, hiddenSidebarWidth, iconSidebarWidth);
-    }
-}
-
-function handleMiddleClick(setState, applyStyles, addEventListeners, removeEventListeners, panelsContainer, hiddenSidebarWidth, iconSidebarWidth) {
-    console.log("Middle click - current state:", currentState);
-
-    if (currentState === STATES.PINNED) {
-        setState(STATES.HIDDEN, applyStyles, addEventListeners, removeEventListeners, panelsContainer, hiddenSidebarWidth, iconSidebarWidth);
-    } else if (currentState === STATES.OVERLAY) {
-        setState(STATES.HIDDEN, applyStyles, addEventListeners, removeEventListeners, panelsContainer, hiddenSidebarWidth, iconSidebarWidth);
-    } else if (currentState === STATES.HIDDEN) {
-        setState(STATES.OVERLAY, applyStyles, addEventListeners, removeEventListeners, panelsContainer, hiddenSidebarWidth, iconSidebarWidth);
-    }
-}
-
-function handleSidebarButtonClick(button, setState, applyStyles, addEventListeners, removeEventListeners, panelsContainer, hiddenSidebarWidth, iconSidebarWidth) {
-    console.log("Sidebar button clicked:", button);
-
-    const isSharpTabsButton = button.matches(`button[aria-label="Sharp Tabs"]`);
-    const isActiveSharpTabsButton = isSharpTabsButton && button.closest(".button-toolbar.active");
-
-    if (isSharpTabsButton) {
-        if (isActiveSharpTabsButton) {
-            console.log("Active Sharp Tabs button clicked, restoring to previous state:", previousState);
-            // If clicking active Sharp Tabs button, restore to previous state
-            if (previousState && previousState !== currentState) {
-                setState(previousState, applyStyles, addEventListeners, removeEventListeners, panelsContainer, hiddenSidebarWidth, iconSidebarWidth);
-                previousState = null; // Clear the saved state
+        const styles = `
+            :root {
+                --width-1: ${config.fullWidth};
+                --width-minimized: ${actualWidth};
+                --width-hovered: ${config.expandedWidth};
             }
-        } else {
-            console.log("Inactive Sharp Tabs button clicked, doing nothing");
-            // If clicking inactive Sharp Tabs button, do nothing
-        }
-    } else {
-        console.log("Non-Sharp Tabs button clicked, saving current state and going to pinned");
-        // If clicking any other button, always save current state (even if already pinned) and ensure we're in pinned state
-        previousState = currentState;
-        console.log("Saved previous state:", previousState);
-        // Only call setState if we're not already in pinned state to avoid unnecessary operations
-        if (currentState !== STATES.PINNED) {
-            setState(STATES.PINNED, applyStyles, addEventListeners, removeEventListeners, panelsContainer, hiddenSidebarWidth, iconSidebarWidth);
-        }
-    }
-}
+            #panels-container.panel-expanded {
+                width: var(--width-1) !important;
+            }
+            #webview-container {
+                padding-left: var(--width-minimized) !important;
+            }
+            #panels-container:not(.panel-expanded) {
+                width: var(--width-minimized) !important;
+            }
+            #panels-container {
+                position: absolute !important;
+                height: calc(100vh - 83px) !important;
+                transition: width 0.1s ease-in-out !important;
+            }
+            .panel-collapse-guard {
+                min-width: var(--width-minimized) !important;
+                max-width: var(--width-hovered) !important;
+            }
+            #panels-container.panel-expanded {
+                width: var(--width-hovered) !important;
+            }
+        `;
 
-function addSidebarButtonListeners(setState, applyStyles, addEventListeners, removeEventListeners, panelsContainer, hiddenSidebarWidth, iconSidebarWidth) {
-    console.log("Adding sidebar button listeners");
+        const styleElement = document.createElement("style");
+        styleElement.id = "vivaldi-sidebar-styles";
+        styleElement.textContent = styles;
+        document.head.appendChild(styleElement);
 
-    // Add event listeners to all buttons in the sidebar
-    const sidebarButtons = document.querySelectorAll("#panels .button-toolbar button");
-    console.log("Found sidebar buttons:", sidebarButtons.length);
-
-    sidebarButtons.forEach((button) => {
-        // Remove existing listeners to prevent duplicates
-        button.removeEventListener("click", button._sidebarClickHandler);
-
-        // Create new handler and store reference for later removal
-        button._sidebarClickHandler = (e) => {
-            handleSidebarButtonClick(button, setState, applyStyles, addEventListeners, removeEventListeners, panelsContainer, hiddenSidebarWidth, iconSidebarWidth);
-        };
-
-        button.addEventListener("click", button._sidebarClickHandler);
-        console.log("Added click listener to button:", button.getAttribute("aria-label") || button.textContent || "unnamed");
-    });
-}
-
-function handleMouseEnter(panelsContainer) {
-    console.log("Mouse enter event triggered, current state:", currentState);
-    if (currentState === STATES.PINNED) return;
-
-    // Clear any pending collapse timeout
-    if (collapseTimeout) {
-        clearTimeout(collapseTimeout);
-        collapseTimeout = null;
-        console.log("Cleared collapse timeout");
+        console.log("Styles applied successfully");
     }
 
-    // Check if there's no active button - if so, don't expand the sidebar
-    const activeButton = document.querySelector(`.button-toolbar.active > button[aria-label="Sharp Tabs"]`);
-    if (!activeButton) {
-        console.log("No active button found, skipping expansion");
-        return;
+    function removeStyles() {
+        const existingStyle = document.getElementById("vivaldi-sidebar-styles");
+        if (existingStyle) existingStyle.remove();
     }
 
-    // If already expanded, don't set a new timeout
-    if (panelsContainer.classList.contains("panel-expanded")) {
-        console.log("Panel already expanded, skipping timeout");
-        return;
+    // === EVENT LISTENERS ===
+    function addEventListeners() {
+        console.log("Adding event listeners");
+        panelsContainer.addEventListener("mouseenter", handleMouseEnter);
+        panelsContainer.addEventListener("mouseleave", handleMouseLeave);
+        console.log("Event listeners added");
     }
 
-    // Set expand timeout
-    expandTimeout = setTimeout(() => {
-        console.log("Expanding panel after 20ms delay");
-        panelsContainer.classList.add("panel-expanded");
-        expandTimeout = null;
-    }, 20);
-}
-
-function handleMouseLeave(panelsContainer) {
-    console.log("Mouse leave event triggered, current state:", currentState);
-    if (currentState === STATES.PINNED) return;
-
-    // Clear any pending expand timeout
-    if (expandTimeout) {
-        clearTimeout(expandTimeout);
-        expandTimeout = null;
-        console.log("Cleared expand timeout");
+    function removeEventListeners() {
+        console.log("Removing event listeners");
+        panelsContainer.removeEventListener("mouseenter", handleMouseEnter);
+        panelsContainer.removeEventListener("mouseleave", handleMouseLeave);
+        console.log("Event listeners removed");
     }
 
-    // Set collapse timeout
-    collapseTimeout = setTimeout(() => {
-        console.log("Collapsing panel after 300ms delay");
-        panelsContainer.classList.remove("panel-expanded");
-        collapseTimeout = null;
-    }, 300);
-}
+    // === MOUSE EVENTS ===
+    function handleMouseEnter() {
+        console.log("Mouse enter event triggered, current state:", currentState);
+        if (currentState === SIDEPANEL_STATES.PINNED) return;
 
-function addEventListeners(panelsContainer, handleMouseEnterFn, handleMouseLeaveFn) {
-    console.log("Adding event listeners");
-    panelsContainer.addEventListener("mouseenter", handleMouseEnterFn);
-    panelsContainer.addEventListener("mouseleave", handleMouseLeaveFn);
-    console.log("Event listeners added");
-}
+        clearTimeoutByType("collapse");
 
-function removeEventListeners(panelsContainer, handleMouseEnterFn, handleMouseLeaveFn) {
-    console.log("Removing event listeners");
-    panelsContainer.removeEventListener("mouseenter", handleMouseEnterFn);
-    panelsContainer.removeEventListener("mouseleave", handleMouseLeaveFn);
-    console.log("Event listeners removed");
-}
-
-function waitForToggleElement(handleLeftClickFn, handleMiddleClickFn) {
-    console.log("Setting up mutation observer for toggle button");
-    const observer = new MutationObserver((mutations, obs) => {
-        const toggleButton = document.querySelector("#panels #switch div.button-toolbar.toolbar-spacer-flexible");
-        console.log("Checking for toggle button:", toggleButton);
-        if (toggleButton) {
-            console.log("Toggle button found, adding click listeners");
-            toggleButton.addEventListener("click", (e) => {
-                console.log("Toggle button clicked");
-                handleLeftClickFn();
-                e.preventDefault();
-            });
-            toggleButton.addEventListener("auxclick", (e) => {
-                console.log("Toggle button middle click event triggered");
-                if (e.button === 1) {
-                    handleMiddleClickFn();
-                    e.preventDefault();
-                }
-            });
-            obs.disconnect();
-            console.log("Toggle button found and click listeners attached");
-        }
-    });
-    observer.observe(document.body, {
-        childList: true,
-        subtree: true,
-    });
-    console.log("Mutation observer started");
-}
-
-function initHoverSidebar() {
-    let hiddenSidebarWidth = "34px";
-    let iconSidebarWidth = "72px";
-
-    console.log("Interval check running");
-    const panelsContainer = document.getElementById("panels-container");
-    const toggleButton = document.querySelector("#panels #switch div.button-toolbar.toolbar-spacer-flexible");
-    console.log("Looking for panels-container:", panelsContainer);
-
-    if (panelsContainer) {
-        if (panelsContainer.getAttribute("data-mod-applied") === "true" && toggleButton && toggleButton.getAttribute("data-mod-applied") === "true") {
-            console.log("Already loaded, clearing interval");
-            clearInterval(intervalId);
+        if (!getActiveSharpTabsButton()) {
+            console.log("No active button found, skipping expansion");
             return;
         }
 
-        console.log("Found panels-container, clearing interval");
-        clearInterval(intervalId);
-        panelsContainer.setAttribute("data-mod-applied", true);
-
-        function applyStyles(currentSidebarWidth) {
-            console.log("Applying styles with width:", currentSidebarWidth);
-
-            // Check if there's an active button - if not, set width to 0
-            const activeButton = document.querySelector(".button-toolbar.active > button[aria-label='Sharp Tabs']");
-            const actualWidth = activeButton ? currentSidebarWidth : "34px";
-
-            console.log("Active button found:", !!activeButton, "Using width:", actualWidth);
-
-            const existingStyleElement = document.getElementById("vivaldi-sidebar-styles");
-            if (existingStyleElement) {
-                existingStyleElement.remove();
-            }
-            const styleElement = document.createElement("style");
-            styleElement.id = "vivaldi-sidebar-styles";
-            styleElement.textContent = sidebarStyles.replace("{currentSidebarWidth}", actualWidth);
-            document.head.appendChild(styleElement);
-            console.log("Styles applied successfully");
+        if (panelsContainer.classList.contains("panel-expanded")) {
+            console.log("Panel already expanded, skipping timeout");
+            return;
         }
 
-        // Create bound functions for event handlers
-        const handleMouseEnterFn = () => handleMouseEnter(panelsContainer);
-        const handleMouseLeaveFn = () => handleMouseLeave(panelsContainer);
+        expandTimeout = setTimeout(() => {
+            console.log("Expanding panel after 20ms delay");
+            panelsContainer.classList.add("panel-expanded");
+            expandTimeout = null;
+        }, config.expandDelay);
+    }
 
-        const addEventListenersFn = () => {
-            addEventListeners(panelsContainer, handleMouseEnterFn, handleMouseLeaveFn);
+    function handleMouseLeave() {
+        console.log("Mouse leave event triggered, current state:", currentState);
+        if (currentState === SIDEPANEL_STATES.PINNED) return;
+
+        clearTimeoutByType("expand");
+
+        collapseTimeout = setTimeout(() => {
+            console.log("Collapsing panel after 200ms delay");
+            panelsContainer.classList.remove("panel-expanded");
+            collapseTimeout = null;
+        }, config.collapseDelay);
+    }
+
+    function clearTimeoutByType(type) {
+        if (type === "expand" && expandTimeout) {
+            clearTimeout(expandTimeout);
+            expandTimeout = null;
+            console.log("Cleared expand timeout");
+        }
+        if (type === "collapse" && collapseTimeout) {
+            clearTimeout(collapseTimeout);
+            collapseTimeout = null;
+            console.log("Cleared collapse timeout");
+        }
+    }
+
+    // === CLICK HANDLERS ===
+    function handleLeftClick() {
+        console.log("Left click - current state:", currentState);
+
+        const transitions = {
+            [SIDEPANEL_STATES.PINNED]: SIDEPANEL_STATES.OVERLAY,
+            [SIDEPANEL_STATES.OVERLAY]: SIDEPANEL_STATES.PINNED,
+            [SIDEPANEL_STATES.HIDDEN]: SIDEPANEL_STATES.PINNED,
         };
 
-        const removeEventListenersFn = () => {
-            removeEventListeners(panelsContainer, handleMouseEnterFn, handleMouseLeaveFn);
+        setState(transitions[currentState]);
+    }
+
+    function handleMiddleClick() {
+        console.log("Middle click - current state:", currentState);
+
+        const transitions = {
+            [SIDEPANEL_STATES.PINNED]: SIDEPANEL_STATES.HIDDEN,
+            [SIDEPANEL_STATES.OVERLAY]: SIDEPANEL_STATES.HIDDEN,
+            [SIDEPANEL_STATES.HIDDEN]: SIDEPANEL_STATES.OVERLAY,
         };
 
-        const setStateFn = (newState) => {
-            setState(newState, applyStyles, addEventListenersFn, removeEventListenersFn, panelsContainer, hiddenSidebarWidth, iconSidebarWidth);
-        };
+        setState(transitions[currentState]);
+    }
 
-        const handleLeftClickFn = () => {
-            handleLeftClick(setStateFn, applyStyles, addEventListenersFn, removeEventListenersFn, panelsContainer, hiddenSidebarWidth, iconSidebarWidth);
-        };
+    // === SIDEBAR BUTTON HANDLING ===
+    function handleSidebarButtonClick(button) {
+        console.log("Sidebar button clicked:", button);
 
-        const handleMiddleClickFn = () => {
-            handleMiddleClick(setStateFn, applyStyles, addEventListenersFn, removeEventListenersFn, panelsContainer, hiddenSidebarWidth, iconSidebarWidth);
-        };
+        const isSharpTabsButton = button.matches(`button[aria-label="Sharp Tabs"], button[aria-label*="/sb.html"]`);
+        const isActiveSharpTabsButton = isSharpTabsButton && button.closest(".button-toolbar.active");
 
-        // Initial setup - start in overlay state
-        console.log("Starting initial setup");
-        setStateFn(STATES.OVERLAY);
-        waitForToggleElement(handleLeftClickFn, handleMiddleClickFn);
+        if (isSharpTabsButton) {
+            if (isActiveSharpTabsButton) {
+                console.log("Active Sharp Tabs button clicked, restoring to previous state:", previousState);
+                if (previousState && previousState !== currentState) {
+                    setState(previousState);
+                    previousState = null;
+                }
+            } else {
+                console.log("Inactive Sharp Tabs button clicked, doing nothing");
+            }
+        } else {
+            console.log("Non-Sharp Tabs button clicked, saving current state and going to pinned");
+            previousState = currentState;
+            console.log("Saved previous state:", previousState);
 
-        // Watch for changes in active button state to update width dynamically
-        const buttonObserver = new MutationObserver((mutations) => {
+            if (currentState !== SIDEPANEL_STATES.PINNED) {
+                setState(SIDEPANEL_STATES.PINNED);
+            }
+        }
+    }
+
+    function addSidebarButtonListeners() {
+        console.log("Adding sidebar button listeners");
+
+        const sidebarButtons = document.querySelectorAll("#panels .button-toolbar button");
+        console.log("Found sidebar buttons:", sidebarButtons.length);
+
+        sidebarButtons.forEach((button) => {
+            // Remove existing listeners to prevent duplicates
+            if (button._sidebarClickHandler) {
+                button.removeEventListener("click", button._sidebarClickHandler);
+            }
+
+            // Create new handler and store reference for later removal
+            button._sidebarClickHandler = () => handleSidebarButtonClick(button);
+            button.addEventListener("click", button._sidebarClickHandler);
+
+            console.log("Added click listener to button:", button.getAttribute("aria-label") || button.textContent || "unnamed");
+        });
+    }
+
+    // === TOGGLE BUTTON ===
+    function setupToggleButton() {
+        if (toggleButton) {
+            attachToggleListeners();
+            return;
+        }
+
+        waitForToggleElement();
+    }
+
+    function waitForToggleElement() {
+        console.log("Setting up mutation observer for toggle button");
+
+        toggleObserver = new MutationObserver((mutations, obs) => {
+            toggleButton = document.querySelector("#panels #switch div.button-toolbar.toolbar-spacer-flexible");
+            console.log("Checking for toggle button:", toggleButton);
+
+            if (toggleButton) {
+                console.log("Toggle button found, adding click listeners");
+                attachToggleListeners();
+                obs.disconnect();
+                console.log("Toggle button found and click listeners attached");
+            }
+        });
+
+        toggleObserver.observe(document.body, {
+            childList: true,
+            subtree: true,
+        });
+
+        console.log("Mutation observer started");
+    }
+
+    function attachToggleListeners() {
+        toggleButton.addEventListener("click", (e) => {
+            console.log("Toggle button clicked");
+            handleLeftClick();
+            e.preventDefault();
+        });
+
+        toggleButton.addEventListener("auxclick", (e) => {
+            console.log("Toggle button middle click event triggered");
+            if (e.button === 1) {
+                handleMiddleClick();
+                e.preventDefault();
+            }
+        });
+    }
+
+    function addIconToToggleButton(icon, dataModValue = "true") {
+        if (!toggleButton) return;
+
+        const svgContainer = document.createElement("div");
+        svgContainer.style.cssText = "display: flex; flex-direction: column; align-items: center; height: 100%;";
+
+        const svgElement = document.createElement("div");
+        svgElement.innerHTML = icon;
+        svgElement.style.cssText = "margin-top: 0; margin-bottom: auto;";
+
+        svgContainer.appendChild(svgElement);
+        toggleButton.style = "padding-top: 5px;";
+        toggleButton.innerHTML = "";
+        toggleButton.appendChild(svgContainer);
+        toggleButton.setAttribute("data-mod-applied", dataModValue);
+    }
+
+    // === OBSERVERS ===
+    function setupButtonObserver() {
+        buttonObserver = new MutationObserver((mutations) => {
             let shouldReapplyStyles = false;
             let shouldReaddButtonListeners = false;
 
@@ -342,7 +374,6 @@ function initHoverSidebar() {
                     }
                 }
 
-                // Check if new buttons were added
                 if (mutation.type === "childList") {
                     const addedNodes = Array.from(mutation.addedNodes);
                     const hasNewButtons = addedNodes.some((node) => node.nodeType === Node.ELEMENT_NODE && (node.matches("button") || node.querySelector("button")));
@@ -352,11 +383,10 @@ function initHoverSidebar() {
                 }
             });
 
-            if (shouldReapplyStyles) {
+            if (shouldReapplyStyles && getCurrentVivaldiSidebarWidth() !== "0px") {
                 console.log("Button state changed, reapplying styles");
-                // Only reapply styles if not in pinned state
-                if (currentState !== STATES.PINNED) {
-                    const currentWidth = currentState === STATES.HIDDEN ? hiddenSidebarWidth : iconSidebarWidth;
+                if (currentState !== SIDEPANEL_STATES.PINNED) {
+                    const currentWidth = currentState === SIDEPANEL_STATES.HIDDEN ? config.hiddenWidth : config.iconWidth;
                     applyStyles(currentWidth);
                 } else {
                     console.log("In pinned state, not applying styles");
@@ -366,12 +396,11 @@ function initHoverSidebar() {
             if (shouldReaddButtonListeners) {
                 console.log("New buttons detected, re-adding button listeners");
                 setTimeout(() => {
-                    addSidebarButtonListeners(setStateFn, applyStyles, addEventListenersFn, removeEventListenersFn, panelsContainer, hiddenSidebarWidth, iconSidebarWidth);
-                }, 100); // Small delay to ensure DOM is fully updated
+                    addSidebarButtonListeners();
+                }, 100);
             }
         });
 
-        // Observe the panels container for button state changes and new buttons
         const panelsElement = document.getElementById("panels");
         if (panelsElement) {
             buttonObserver.observe(panelsElement, {
@@ -382,19 +411,104 @@ function initHoverSidebar() {
             });
             console.log("Button state observer started");
         }
-
-        // Add listeners for sidebar buttons
-        addSidebarButtonListeners(setStateFn, applyStyles, addEventListenersFn, removeEventListenersFn, panelsContainer, hiddenSidebarWidth, iconSidebarWidth);
-
-        console.log("Initial setup complete");
-
-        setInterval(initHoverSidebar, 5000);
     }
-}
 
-(function () {
-    "use strict";
-    console.log("Script starting execution");
-    intervalId = setInterval(initHoverSidebar, 800);
-    console.log("Interval set up to check for panels-container");
+    function setupPanelWidthObserver() {
+        console.log("Setting up panel width observer");
+
+        // Create observer to watch for style changes on panels-container
+        panelObserver = new MutationObserver((mutations) => {
+            mutations.forEach((mutation) => {
+                console.log("Panel element changed, mutation details:", mutation);
+                if (mutation.type === "attributes" && mutation.attributeName === "style") {
+                    updateVivaldiPanelWidth();
+                }
+            });
+        });
+
+        // Start observing
+        panelObserver.observe(panelsContainer, {
+            attributes: true,
+            attributeFilter: ["style"],
+        });
+
+        console.log("Panel width observer started");
+    }
+
+    // === UTILITY METHODS ===
+    function getCurrentVivaldiSidebarWidth() {
+        const style = panelsContainer.getAttribute("style") || "";
+        const match = style.match(/width:\s*(\d+(?:\.\d+)?px)/);
+        return match ? match[1] : null;
+    }
+
+    function getActiveSharpTabsButton() {
+        return document.querySelector('.button-toolbar.active > button[aria-label="Sharp Tabs"], .button-toolbar.active > button[aria-label*="/sb.html"]');
+    }
+
+    function updateVivaldiPanelWidth() {
+        // Check current width of panels-container to determine initial state
+        const currentWidth = getCurrentVivaldiSidebarWidth();
+
+        console.log("Initial width check:", currentWidth);
+
+        if (currentWidth === "0px") {
+            // Width is 0px - initialize saved state to overlay and set current to pinned
+            console.log("Initial width is 0px, setting to pinned with overlay saved");
+
+            stateBeforeHidingVivaldiPanel = currentState;
+            setState(SIDEPANEL_STATES.PINNED);
+        } else {
+            // Width is not 0px - initialize to overlay state
+            console.log("Initial width is not 0px, setting to overlay");
+            setState(stateBeforeHidingVivaldiPanel || SIDEPANEL_STATES.OVERLAY);
+        }
+    }
+
+    // === CLEANUP ===
+    function destroy() {
+        // Clear timeouts
+        clearTimeoutByType("expand");
+        clearTimeoutByType("collapse");
+
+        // Remove event listeners
+        removeEventListeners();
+
+        // Disconnect observers
+        if (buttonObserver) {
+            buttonObserver.disconnect();
+        }
+        if (toggleObserver) {
+            toggleObserver.disconnect();
+        }
+        if (panelObserver) {
+            panelObserver.disconnect();
+        }
+
+        // Remove styles
+        removeStyles();
+
+        console.log("Sidebar manager destroyed");
+    }
+
+    // === INITIALIZATION AND MANAGEMENT ===
+    let initInterval;
+
+    function initializeManager() {
+        console.log("Attempting to initialize manager");
+
+        if (init()) {
+            console.log("Manager initialized successfully, clearing init interval");
+            clearInterval(initInterval);
+
+            // Set up periodic reinitialization to handle page changes
+            setInterval(() => {
+                init();
+            }, config.reinitInterval);
+        }
+    }
+
+    // === SCRIPT ENTRY POINT ===
+    console.log("Vivaldi Sidebar Manager starting execution. Looking for panels-container to initialize styles on it.");
+    initInterval = setInterval(initializeManager, config.initCheckInterval);
 })();
