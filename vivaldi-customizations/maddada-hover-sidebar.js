@@ -1,6 +1,19 @@
 (function () {
     ("use strict");
 
+    // Use configurable settings
+    const config = {
+        height: "calc(100vh - 83px)",
+        hiddenWidth: "34px",
+        minimizedWidth: "72px",
+        expandedWidth: "260px",
+        fullWidth: "300px",
+        expandDelay: 20, // ms
+        collapseDelay: 200, // ms
+        initCheckInterval: 800, // ms
+        reinitInterval: 5000, // ms
+    };
+
     // State constants
     const SIDEPANEL_STATES = {
         PINNED: "pinned",
@@ -8,10 +21,12 @@
         HIDDEN: "hidden",
     };
 
-    // State management
+    // Sidepanel state management
     let currentState = SIDEPANEL_STATES.OVERLAY;
     let previousState = null;
-    let stateBeforeHidingVivaldiPanel = null;
+
+    // Panel Container state management
+    let stateBeforeHidingPanelContainer = null;
 
     // Timeouts
     let expandTimeout = null;
@@ -26,21 +41,9 @@
     let toggleObserver = null;
     let panelObserver = null;
 
-    // Configuration
-    const config = {
-        hiddenWidth: "34px",
-        iconWidth: "72px",
-        expandedWidth: "260px",
-        fullWidth: "300px",
-        expandDelay: 20,
-        collapseDelay: 200,
-        initCheckInterval: 800,
-        reinitInterval: 5000,
-    };
-
     // === INITIALIZATION ===
     function init() {
-        console.log("Interval check running");
+        console.log("[init] Interval check running");
 
         panelsContainer = document.getElementById("panels-container");
         toggleButton = document.querySelector("#panels #switch div.button-toolbar.toolbar-spacer-flexible");
@@ -50,12 +53,12 @@
         }
 
         if (isAlreadyInitialized()) {
-            console.log("Already loaded, skipping initialization");
+            console.log("[init] Already loaded, skipping initialization");
             return true;
         }
 
-        console.log("Found panels-container, initializing");
-        updateVivaldiPanelWidth();
+        console.log("[init] Found panels-container, initializing");
+        reactToPanelContainerWidthModification();
         markAsInitialized();
         setupToggleButton();
         setupButtonObserver();
@@ -75,7 +78,7 @@
 
     // === STATE MANAGEMENT ===
     function setState(newState) {
-        console.log("Setting state to:", newState);
+        console.log("[setState] Setting state to:", newState);
         currentState = newState;
 
         switch (newState) {
@@ -84,33 +87,33 @@
                 removeStyles();
                 panelsContainer.classList.remove("panel-expanded");
                 addIconToToggleButton("⏺︎");
-                console.log("State: PINNED");
+                console.log("[setState] State: PINNED");
                 break;
 
             case SIDEPANEL_STATES.OVERLAY:
-                applyStyles(config.iconWidth);
+                applyStyles(config.minimizedWidth);
                 addEventListeners();
                 addIconToToggleButton("▶︎");
-                console.log("State: OVERLAY");
+                console.log("[setState] State: OVERLAY");
                 break;
 
             case SIDEPANEL_STATES.HIDDEN:
                 applyStyles(config.hiddenWidth);
                 addEventListeners();
                 addIconToToggleButton("◁");
-                console.log("State: HIDDEN");
+                console.log("[setState] State: HIDDEN");
                 break;
         }
     }
 
     // === STYLES ===
     function applyStyles(sidebarWidth) {
-        console.log("Applying styles with width:", sidebarWidth);
+        console.log("[applyStyles] Applying styles with width:", sidebarWidth);
 
         const activeButton = getActiveSharpTabsButton();
         const actualWidth = activeButton ? sidebarWidth : config.hiddenWidth;
 
-        console.log("Active button found:", !!activeButton, "Using width:", actualWidth);
+        console.log("[applyStyles] Active button found:", !!activeButton, "Using width:", actualWidth);
 
         removeStyles();
 
@@ -131,7 +134,7 @@
             }
             #panels-container {
                 position: absolute !important;
-                height: calc(100vh - 83px) !important;
+                height: ${config.height} !important;
                 transition: width 0.1s ease-in-out !important;
             }
             .panel-collapse-guard {
@@ -148,7 +151,7 @@
         styleElement.textContent = styles;
         document.head.appendChild(styleElement);
 
-        console.log("Styles applied successfully");
+        console.log("[applyStyles] Styles applied successfully");
     }
 
     function removeStyles() {
@@ -158,51 +161,51 @@
 
     // === EVENT LISTENERS ===
     function addEventListeners() {
-        console.log("Adding event listeners");
+        console.log("[addEventListeners] Adding event listeners");
         panelsContainer.addEventListener("mouseenter", handleMouseEnter);
         panelsContainer.addEventListener("mouseleave", handleMouseLeave);
-        console.log("Event listeners added");
+        console.log("[addEventListeners] Event listeners added");
     }
 
     function removeEventListeners() {
-        console.log("Removing event listeners");
+        console.log("[removeEventListeners] Removing event listeners");
         panelsContainer.removeEventListener("mouseenter", handleMouseEnter);
         panelsContainer.removeEventListener("mouseleave", handleMouseLeave);
-        console.log("Event listeners removed");
+        console.log("[removeEventListeners] Event listeners removed");
     }
 
     // === MOUSE EVENTS ===
     function handleMouseEnter() {
-        console.log("Mouse enter event triggered, current state:", currentState);
+        console.log("[handleMouseEnter] Mouse enter event triggered, current state:", currentState);
         if (currentState === SIDEPANEL_STATES.PINNED) return;
 
         clearTimeoutByType("collapse");
 
         if (!getActiveSharpTabsButton()) {
-            console.log("No active button found, skipping expansion");
+            console.log("[handleMouseEnter] No active button found, skipping expansion");
             return;
         }
 
         if (panelsContainer.classList.contains("panel-expanded")) {
-            console.log("Panel already expanded, skipping timeout");
+            console.log("[handleMouseEnter] Panel already expanded, skipping timeout");
             return;
         }
 
         expandTimeout = setTimeout(() => {
-            console.log("Expanding panel after 20ms delay");
+            console.log("[handleMouseEnter] Expanding panel after 20ms delay");
             panelsContainer.classList.add("panel-expanded");
             expandTimeout = null;
         }, config.expandDelay);
     }
 
     function handleMouseLeave() {
-        console.log("Mouse leave event triggered, current state:", currentState);
+        console.log("[handleMouseLeave] Mouse leave event triggered, current state:", currentState);
         if (currentState === SIDEPANEL_STATES.PINNED) return;
 
         clearTimeoutByType("expand");
 
         collapseTimeout = setTimeout(() => {
-            console.log("Collapsing panel after 200ms delay");
+            console.log("[handleMouseLeave] Collapsing panel after 200ms delay");
             panelsContainer.classList.remove("panel-expanded");
             collapseTimeout = null;
         }, config.collapseDelay);
@@ -212,18 +215,18 @@
         if (type === "expand" && expandTimeout) {
             clearTimeout(expandTimeout);
             expandTimeout = null;
-            console.log("Cleared expand timeout");
+            console.log("[clearTimeoutByType] Cleared expand timeout");
         }
         if (type === "collapse" && collapseTimeout) {
             clearTimeout(collapseTimeout);
             collapseTimeout = null;
-            console.log("Cleared collapse timeout");
+            console.log("[clearTimeoutByType] Cleared collapse timeout");
         }
     }
 
     // === CLICK HANDLERS ===
     function handleLeftClick() {
-        console.log("Left click - current state:", currentState);
+        console.log("[handleLeftClick] Left click - current state:", currentState);
 
         const transitions = {
             [SIDEPANEL_STATES.PINNED]: SIDEPANEL_STATES.OVERLAY,
@@ -235,7 +238,7 @@
     }
 
     function handleMiddleClick() {
-        console.log("Middle click - current state:", currentState);
+        console.log("[handleMiddleClick] Middle click - current state:", currentState);
 
         const transitions = {
             [SIDEPANEL_STATES.PINNED]: SIDEPANEL_STATES.HIDDEN,
@@ -248,25 +251,25 @@
 
     // === SIDEBAR BUTTON HANDLING ===
     function handleSidebarButtonClick(button) {
-        console.log("Sidebar button clicked:", button);
+        console.log("[handleSidebarButtonClick] Sidebar button clicked:", button);
 
         const isSharpTabsButton = button.matches(`button[aria-label="Sharp Tabs"], button[aria-label*="/sb.html"]`);
         const isActiveSharpTabsButton = isSharpTabsButton && button.closest(".button-toolbar.active");
 
         if (isSharpTabsButton) {
             if (isActiveSharpTabsButton) {
-                console.log("Active Sharp Tabs button clicked, restoring to previous state:", previousState);
+                console.log("[handleSidebarButtonClick] Active Sharp Tabs button clicked, restoring to previous state:", previousState);
                 if (previousState && previousState !== currentState) {
                     setState(previousState);
                     previousState = null;
                 }
             } else {
-                console.log("Inactive Sharp Tabs button clicked, doing nothing");
+                console.log("[handleSidebarButtonClick] Inactive Sharp Tabs button clicked, doing nothing");
             }
         } else {
-            console.log("Non-Sharp Tabs button clicked, saving current state and going to pinned");
+            console.log("[handleSidebarButtonClick] Non-Sharp Tabs button clicked, saving current state and going to pinned");
             previousState = currentState;
-            console.log("Saved previous state:", previousState);
+            console.log("[handleSidebarButtonClick] Saved previous state:", previousState);
 
             if (currentState !== SIDEPANEL_STATES.PINNED) {
                 setState(SIDEPANEL_STATES.PINNED);
@@ -275,10 +278,10 @@
     }
 
     function addSidebarButtonListeners() {
-        console.log("Adding sidebar button listeners");
+        console.log("[addSidebarButtonListeners] Adding sidebar button listeners");
 
         const sidebarButtons = document.querySelectorAll("#panels .button-toolbar button");
-        console.log("Found sidebar buttons:", sidebarButtons.length);
+        console.log("[addSidebarButtonListeners] Found sidebar buttons:", sidebarButtons.length);
 
         sidebarButtons.forEach((button) => {
             // Remove existing listeners to prevent duplicates
@@ -290,7 +293,7 @@
             button._sidebarClickHandler = () => handleSidebarButtonClick(button);
             button.addEventListener("click", button._sidebarClickHandler);
 
-            console.log("Added click listener to button:", button.getAttribute("aria-label") || button.textContent || "unnamed");
+            console.log("[addSidebarButtonListeners] Added click listener to button:", button.getAttribute("aria-label") || button.textContent || "unnamed");
         });
     }
 
@@ -305,17 +308,17 @@
     }
 
     function waitForToggleElement() {
-        console.log("Setting up mutation observer for toggle button");
+        console.log("[waitForToggleElement] Setting up mutation observer for toggle button");
 
         toggleObserver = new MutationObserver((mutations, obs) => {
             toggleButton = document.querySelector("#panels #switch div.button-toolbar.toolbar-spacer-flexible");
-            console.log("Checking for toggle button:", toggleButton);
+            console.log("[waitForToggleElement] Checking for toggle button:", toggleButton);
 
             if (toggleButton) {
-                console.log("Toggle button found, adding click listeners");
+                console.log("[waitForToggleElement] Toggle button found, adding click listeners");
                 attachToggleListeners();
                 obs.disconnect();
-                console.log("Toggle button found and click listeners attached");
+                console.log("[waitForToggleElement] Toggle button found and click listeners attached");
             }
         });
 
@@ -324,18 +327,18 @@
             subtree: true,
         });
 
-        console.log("Mutation observer started");
+        console.log("[waitForToggleElement] Mutation observer started");
     }
 
     function attachToggleListeners() {
         toggleButton.addEventListener("click", (e) => {
-            console.log("Toggle button clicked");
+            console.log("[attachToggleListeners] Toggle button clicked");
             handleLeftClick();
             e.preventDefault();
         });
 
         toggleButton.addEventListener("auxclick", (e) => {
-            console.log("Toggle button middle click event triggered");
+            console.log("[attachToggleListeners] Toggle button middle click event triggered");
             if (e.button === 1) {
                 handleMiddleClick();
                 e.preventDefault();
@@ -383,18 +386,18 @@
                 }
             });
 
-            if (shouldReapplyStyles && getCurrentVivaldiSidebarWidth() !== "0px") {
-                console.log("Button state changed, reapplying styles");
+            if (shouldReapplyStyles && getCurrentPanelContainerWidth() !== "0px") {
+                console.log("[setupButtonObserver] Button state changed, reapplying styles");
                 if (currentState !== SIDEPANEL_STATES.PINNED) {
-                    const currentWidth = currentState === SIDEPANEL_STATES.HIDDEN ? config.hiddenWidth : config.iconWidth;
+                    const currentWidth = currentState === SIDEPANEL_STATES.HIDDEN ? config.hiddenWidth : config.minimizedWidth;
                     applyStyles(currentWidth);
                 } else {
-                    console.log("In pinned state, not applying styles");
+                    console.log("[setupButtonObserver] In pinned state, not applying styles");
                 }
             }
 
             if (shouldReaddButtonListeners) {
-                console.log("New buttons detected, re-adding button listeners");
+                console.log("[setupButtonObserver] New buttons detected, re-adding button listeners");
                 setTimeout(() => {
                     addSidebarButtonListeners();
                 }, 100);
@@ -409,19 +412,19 @@
                 childList: true,
                 subtree: true,
             });
-            console.log("Button state observer started");
+            console.log("[setupButtonObserver] Button state observer started");
         }
     }
 
     function setupPanelWidthObserver() {
-        console.log("Setting up panel width observer");
+        console.log("[setupPanelWidthObserver] Setting up panel width observer");
 
         // Create observer to watch for style changes on panels-container
         panelObserver = new MutationObserver((mutations) => {
             mutations.forEach((mutation) => {
-                console.log("Panel element changed, mutation details:", mutation);
+                console.log("[setupPanelWidthObserver] Panel element changed, mutation details:", mutation);
                 if (mutation.type === "attributes" && mutation.attributeName === "style") {
-                    updateVivaldiPanelWidth();
+                    reactToPanelContainerWidthModification();
                 }
             });
         });
@@ -432,11 +435,11 @@
             attributeFilter: ["style"],
         });
 
-        console.log("Panel width observer started");
+        console.log("[setupPanelWidthObserver] Panel width observer started");
     }
 
     // === UTILITY METHODS ===
-    function getCurrentVivaldiSidebarWidth() {
+    function getCurrentPanelContainerWidth() {
         const style = panelsContainer.getAttribute("style") || "";
         const match = style.match(/width:\s*(\d+(?:\.\d+)?px)/);
         return match ? match[1] : null;
@@ -446,22 +449,22 @@
         return document.querySelector('.button-toolbar.active > button[aria-label="Sharp Tabs"], .button-toolbar.active > button[aria-label*="/sb.html"]');
     }
 
-    function updateVivaldiPanelWidth() {
+    function reactToPanelContainerWidthModification() {
         // Check current width of panels-container to determine initial state
-        const currentWidth = getCurrentVivaldiSidebarWidth();
+        const currentPanelContainerWidth = getCurrentPanelContainerWidth();
 
-        console.log("Initial width check:", currentWidth);
+        console.log("[reactToPanelContainerWidthModification] Panel container width changed to:", currentPanelContainerWidth);
 
-        if (currentWidth === "0px") {
+        if (currentPanelContainerWidth === "0px") {
             // Width is 0px - initialize saved state to overlay and set current to pinned
-            console.log("Initial width is 0px, setting to pinned with overlay saved");
+            console.log("[reactToPanelContainerWidthModification] Initial width is 0px, setting to pinned with overlay saved");
 
-            stateBeforeHidingVivaldiPanel = currentState;
+            stateBeforeHidingPanelContainer = currentState;
             setState(SIDEPANEL_STATES.PINNED);
         } else {
             // Width is not 0px - initialize to overlay state
-            console.log("Initial width is not 0px, setting to overlay");
-            setState(stateBeforeHidingVivaldiPanel || SIDEPANEL_STATES.OVERLAY);
+            console.log("[reactToPanelContainerWidthModification] Initial width is not 0px, setting to overlay");
+            setState(stateBeforeHidingPanelContainer || SIDEPANEL_STATES.OVERLAY);
         }
     }
 
@@ -488,17 +491,17 @@
         // Remove styles
         removeStyles();
 
-        console.log("Sidebar manager destroyed");
+        console.log("[destroy] Sidebar manager destroyed");
     }
 
     // === INITIALIZATION AND MANAGEMENT ===
     let initInterval;
 
     function initializeManager() {
-        console.log("Attempting to initialize manager");
+        console.log("[initializeManager] Attempting to initialize manager");
 
         if (init()) {
-            console.log("Manager initialized successfully, clearing init interval");
+            console.log("[initializeManager] Manager initialized successfully, clearing init interval");
             clearInterval(initInterval);
 
             // Set up periodic reinitialization to handle page changes
@@ -509,6 +512,6 @@
     }
 
     // === SCRIPT ENTRY POINT ===
-    console.log("Vivaldi Sidebar Manager starting execution. Looking for panels-container to initialize styles on it.");
+    console.log("[SCRIPT START] Vivaldi Sidebar Manager starting execution. Looking for panels-container to initialize styles on it.");
     initInterval = setInterval(initializeManager, config.initCheckInterval);
 })();
