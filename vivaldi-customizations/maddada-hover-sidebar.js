@@ -21,9 +21,13 @@
         HIDDEN: "hidden",
     };
 
+    let firstInit = true;
+
     // Sidepanel state management
     let currentState = SIDEPANEL_STATES.OVERLAY;
     let previousState = null;
+
+    let sharpTabsButtonClicked = false;
 
     // Panel Container state management
     let stateBeforeHidingPanelContainer = null;
@@ -61,9 +65,7 @@
         reactToPanelContainerWidthModification();
         markAsInitialized();
         setupToggleButton();
-        setupButtonObserver();
         setupPanelWidthObserver();
-        addSidebarButtonListeners();
 
         return true;
     }
@@ -78,7 +80,6 @@
 
     // === STATE MANAGEMENT ===
     function setState(newState) {
-        console.log("[setState] Setting state to:", newState);
         currentState = newState;
 
         switch (newState) {
@@ -87,21 +88,21 @@
                 removeStyles();
                 panelsContainer.classList.remove("panel-expanded");
                 addIconToToggleButton("⏺︎");
-                console.log("[setState] State: PINNED");
+                console.log("[setState] Set state to PINNED");
                 break;
 
             case SIDEPANEL_STATES.OVERLAY:
                 applyStyles(config.minimizedWidth);
                 addEventListeners();
                 addIconToToggleButton("▶︎");
-                console.log("[setState] State: OVERLAY");
+                console.log("[setState] Set state to OVERLAY");
                 break;
 
             case SIDEPANEL_STATES.HIDDEN:
                 applyStyles(config.hiddenWidth);
                 addEventListeners();
                 addIconToToggleButton("◁");
-                console.log("[setState] State: HIDDEN");
+                console.log("[setState] Set state to HIDDEN");
                 break;
         }
     }
@@ -224,84 +225,6 @@
         }
     }
 
-    // === CLICK HANDLERS ===
-    function handleLeftClick() {
-        console.log("[handleLeftClick] Left click - current state:", currentState);
-
-        const transitions = {
-            [SIDEPANEL_STATES.PINNED]: SIDEPANEL_STATES.OVERLAY,
-            [SIDEPANEL_STATES.OVERLAY]: SIDEPANEL_STATES.PINNED,
-            [SIDEPANEL_STATES.HIDDEN]: SIDEPANEL_STATES.PINNED,
-        };
-
-        if (transitions[currentState] === SIDEPANEL_STATES.PINNED) {
-            console.log("[handleLeftClick] Setting state to PINNED from handleLeftClick function");
-        }
-        setState(transitions[currentState]);
-    }
-
-    function handleMiddleClick() {
-        console.log("[handleMiddleClick] Middle click - current state:", currentState);
-
-        const transitions = {
-            [SIDEPANEL_STATES.PINNED]: SIDEPANEL_STATES.HIDDEN,
-            [SIDEPANEL_STATES.OVERLAY]: SIDEPANEL_STATES.HIDDEN,
-            [SIDEPANEL_STATES.HIDDEN]: SIDEPANEL_STATES.OVERLAY,
-        };
-
-        setState(transitions[currentState]);
-    }
-
-    // === SIDEBAR BUTTON HANDLING ===
-    function handleSidebarButtonClick(button) {
-        console.log("[handleSidebarButtonClick] Sidebar button clicked:", button);
-
-        const isSharpTabsButton = button.matches(`button[aria-label="Sharp Tabs"], button[aria-label*="/sb.html"]`);
-        const isActiveSharpTabsButton = isSharpTabsButton && button.closest(".button-toolbar.active");
-
-        if (isSharpTabsButton) {
-            setTimeout(() => {
-                if (isActiveSharpTabsButton) {
-                    console.log("[handleSidebarButtonClick] Active Sharp Tabs button clicked, restoring to previous state:", previousState);
-                    if (previousState && previousState !== currentState) {
-                        setState(previousState);
-                    }
-                } else {
-                    console.log("[handleSidebarButtonClick] Inactive Sharp Tabs button clicked, doing nothing");
-                }
-            }, 100);
-        } else {
-            console.log("[handleSidebarButtonClick] Non-Sharp Tabs button clicked, saving current state and going to pinned");
-            previousState = currentState;
-            console.log("[handleSidebarButtonClick] Saved previous state:", previousState);
-
-            if (currentState !== SIDEPANEL_STATES.PINNED) {
-                console.log("[handleSidebarButtonClick] Setting state to PINNED from handleSidebarButtonClick function");
-                setState(SIDEPANEL_STATES.PINNED);
-            }
-        }
-    }
-
-    function addSidebarButtonListeners() {
-        console.log("[addSidebarButtonListeners] Adding sidebar button listeners");
-
-        const sidebarButtons = document.querySelectorAll("#panels .button-toolbar button");
-        console.log("[addSidebarButtonListeners] Found sidebar buttons:", sidebarButtons.length);
-
-        sidebarButtons.forEach((button) => {
-            // Remove existing listeners to prevent duplicates
-            if (button._sidebarClickHandler) {
-                button.removeEventListener("click", button._sidebarClickHandler);
-            }
-
-            // Create new handler and store reference for later removal
-            button._sidebarClickHandler = () => handleSidebarButtonClick(button);
-            button.addEventListener("click", button._sidebarClickHandler);
-
-            console.log("[addSidebarButtonListeners] Added click listener to button:", button.getAttribute("aria-label") || button.textContent || "unnamed");
-        });
-    }
-
     // === TOGGLE BUTTON ===
     function setupToggleButton() {
         if (toggleButton) {
@@ -338,30 +261,37 @@
     function attachToggleListeners() {
         toggleButton.addEventListener("click", (e) => {
             console.log("[attachToggleListeners] Toggle button clicked");
-
-            // Only handle click if Sharp Tabs is active
-            if (!getActiveSharpTabsButton()) {
-                console.log("[attachToggleListeners] Sharp Tabs not active, ignoring toggle button click");
-                e.preventDefault();
-                return;
-            }
-
-            handleLeftClick();
             e.preventDefault();
+
+            console.log("[handleLeftClick] Left click - current state:", currentState);
+
+            const transitions = {
+                [SIDEPANEL_STATES.PINNED]: SIDEPANEL_STATES.OVERLAY,
+                [SIDEPANEL_STATES.OVERLAY]: SIDEPANEL_STATES.PINNED,
+                [SIDEPANEL_STATES.HIDDEN]: SIDEPANEL_STATES.PINNED,
+            };
+
+            if (transitions[currentState] === SIDEPANEL_STATES.PINNED) {
+                console.log("[handleLeftClick] Setting state to PINNED from handleLeftClick function");
+            }
+            setState(transitions[currentState]);
         });
 
         toggleButton.addEventListener("auxclick", (e) => {
             console.log("[attachToggleListeners] Toggle button middle click event triggered");
-            if (e.button === 1) {
-                // Only handle middle click if Sharp Tabs is active
-                if (!getActiveSharpTabsButton()) {
-                    console.log("[attachToggleListeners] Sharp Tabs not active, ignoring toggle button middle click");
-                    e.preventDefault();
-                    return;
-                }
 
-                handleMiddleClick();
+            if (e.button === 1) {
                 e.preventDefault();
+
+                console.log("[handleMiddleClick] Middle click - current state:", currentState);
+
+                const transitions = {
+                    [SIDEPANEL_STATES.PINNED]: SIDEPANEL_STATES.HIDDEN,
+                    [SIDEPANEL_STATES.OVERLAY]: SIDEPANEL_STATES.HIDDEN,
+                    [SIDEPANEL_STATES.HIDDEN]: SIDEPANEL_STATES.OVERLAY,
+                };
+
+                setState(transitions[currentState]);
             }
         });
     }
@@ -383,59 +313,6 @@
         toggleButton.setAttribute("data-mod-applied", dataModValue);
     }
 
-    // === OBSERVERS ===
-    function setupButtonObserver() {
-        buttonObserver = new MutationObserver((mutations) => {
-            let shouldReapplyStyles = false;
-            let shouldReaddButtonListeners = false;
-
-            mutations.forEach((mutation) => {
-                if (mutation.type === "attributes" && mutation.attributeName === "class") {
-                    const target = mutation.target;
-                    if (target.classList.contains("button-toolbar")) {
-                        shouldReapplyStyles = true;
-                    }
-                }
-
-                if (mutation.type === "childList") {
-                    const addedNodes = Array.from(mutation.addedNodes);
-                    const hasNewButtons = addedNodes.some((node) => node.nodeType === Node.ELEMENT_NODE && (node.matches("button") || node.querySelector("button")));
-                    if (hasNewButtons) {
-                        shouldReaddButtonListeners = true;
-                    }
-                }
-            });
-
-            if (shouldReapplyStyles && getCurrentPanelContainerWidth() !== "0px") {
-                console.log("[setupButtonObserver] Button state changed, reapplying styles");
-                if (currentState !== SIDEPANEL_STATES.PINNED) {
-                    const currentWidth = currentState === SIDEPANEL_STATES.HIDDEN ? config.hiddenWidth : config.minimizedWidth;
-                    applyStyles(currentWidth);
-                } else {
-                    console.log("[setupButtonObserver] In pinned state, not applying styles");
-                }
-            }
-
-            if (shouldReaddButtonListeners) {
-                console.log("[setupButtonObserver] New buttons detected, re-adding button listeners");
-                setTimeout(() => {
-                    addSidebarButtonListeners();
-                }, 100);
-            }
-        });
-
-        const panelsElement = document.getElementById("panels");
-        if (panelsElement) {
-            buttonObserver.observe(panelsElement, {
-                attributes: true,
-                attributeFilter: ["class"],
-                childList: true,
-                subtree: true,
-            });
-            console.log("[setupButtonObserver] Button state observer started");
-        }
-    }
-
     function setupPanelWidthObserver() {
         console.log("[setupPanelWidthObserver] Setting up panel width observer");
 
@@ -444,7 +321,9 @@
             mutations.forEach((mutation) => {
                 console.log("[setupPanelWidthObserver] Panel element changed, mutation details:", mutation);
                 if (mutation.type === "attributes" && mutation.attributeName === "style") {
-                    reactToPanelContainerWidthModification();
+                    setTimeout(() => {
+                        reactToPanelContainerWidthModification();
+                    }, 50);
                 }
             });
         });
@@ -483,16 +362,20 @@
             return;
         }
 
+        stateBeforeHidingPanelContainer = currentState;
+
         if (currentPanelContainerWidth === "0px") {
-            // Width is 0px - initialize saved state to overlay and set current to pinned
             console.log("[reactToPanelContainerWidthModification] Initial width is 0px, setting to pinned with overlay saved");
 
-            stateBeforeHidingPanelContainer = currentState;
             setState(SIDEPANEL_STATES.PINNED);
-        } else {
+        } else if (firstInit) {
+            firstInit = false;
             // Width is not 0px - initialize to overlay state
             console.log("[reactToPanelContainerWidthModification] Initial width is not 0px, setting to overlay");
             setState(stateBeforeHidingPanelContainer || SIDEPANEL_STATES.OVERLAY);
+        } else {
+            console.log("[reactToPanelContainerWidthModification] Initial width is not 0px, setting to pinned");
+            setState(stateBeforeHidingPanelContainer);
         }
     }
 
