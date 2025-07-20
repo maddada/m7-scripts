@@ -234,6 +234,9 @@
             [SIDEPANEL_STATES.HIDDEN]: SIDEPANEL_STATES.PINNED,
         };
 
+        if (transitions[currentState] === SIDEPANEL_STATES.PINNED) {
+            console.log("[handleLeftClick] Setting state to PINNED from handleLeftClick function");
+        }
         setState(transitions[currentState]);
     }
 
@@ -257,21 +260,23 @@
         const isActiveSharpTabsButton = isSharpTabsButton && button.closest(".button-toolbar.active");
 
         if (isSharpTabsButton) {
-            if (isActiveSharpTabsButton) {
-                console.log("[handleSidebarButtonClick] Active Sharp Tabs button clicked, restoring to previous state:", previousState);
-                if (previousState && previousState !== currentState) {
-                    setState(previousState);
-                    previousState = null;
+            setTimeout(() => {
+                if (isActiveSharpTabsButton) {
+                    console.log("[handleSidebarButtonClick] Active Sharp Tabs button clicked, restoring to previous state:", previousState);
+                    if (previousState && previousState !== currentState) {
+                        setState(previousState);
+                    }
+                } else {
+                    console.log("[handleSidebarButtonClick] Inactive Sharp Tabs button clicked, doing nothing");
                 }
-            } else {
-                console.log("[handleSidebarButtonClick] Inactive Sharp Tabs button clicked, doing nothing");
-            }
+            }, 100);
         } else {
             console.log("[handleSidebarButtonClick] Non-Sharp Tabs button clicked, saving current state and going to pinned");
             previousState = currentState;
             console.log("[handleSidebarButtonClick] Saved previous state:", previousState);
 
             if (currentState !== SIDEPANEL_STATES.PINNED) {
+                console.log("[handleSidebarButtonClick] Setting state to PINNED from handleSidebarButtonClick function");
                 setState(SIDEPANEL_STATES.PINNED);
             }
         }
@@ -333,6 +338,14 @@
     function attachToggleListeners() {
         toggleButton.addEventListener("click", (e) => {
             console.log("[attachToggleListeners] Toggle button clicked");
+
+            // Only handle click if Sharp Tabs is active
+            if (!getActiveSharpTabsButton()) {
+                console.log("[attachToggleListeners] Sharp Tabs not active, ignoring toggle button click");
+                e.preventDefault();
+                return;
+            }
+
             handleLeftClick();
             e.preventDefault();
         });
@@ -340,6 +353,13 @@
         toggleButton.addEventListener("auxclick", (e) => {
             console.log("[attachToggleListeners] Toggle button middle click event triggered");
             if (e.button === 1) {
+                // Only handle middle click if Sharp Tabs is active
+                if (!getActiveSharpTabsButton()) {
+                    console.log("[attachToggleListeners] Sharp Tabs not active, ignoring toggle button middle click");
+                    e.preventDefault();
+                    return;
+                }
+
                 handleMiddleClick();
                 e.preventDefault();
             }
@@ -454,6 +474,14 @@
         const currentPanelContainerWidth = getCurrentPanelContainerWidth();
 
         console.log("[reactToPanelContainerWidthModification] Panel container width changed to:", currentPanelContainerWidth);
+
+        // Check if user is manually resizing the panel
+        const isManuallyResizing = panelsContainer.classList.contains("resizing");
+
+        if (isManuallyResizing && currentState === SIDEPANEL_STATES.PINNED) {
+            console.log("[reactToPanelContainerWidthModification] Manual resizing detected in pinned mode, maintaining current state");
+            return;
+        }
 
         if (currentPanelContainerWidth === "0px") {
             // Width is 0px - initialize saved state to overlay and set current to pinned
