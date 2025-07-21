@@ -185,6 +185,7 @@
                     },
                     {
                         "description": "Remap Command+Tab to Command+Shift+Option+Semicolon (AI complete in Cursor)",
+                        "enabled": false,
                         "manipulators": [
                             {
                                 "conditions": [
