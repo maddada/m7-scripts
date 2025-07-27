@@ -1,9 +1,18 @@
 (function () {
     ("use strict");
 
+    // Helper function to check if bookmarks bar is enabled
+    function isBookmarksBarEnabled() {
+        return document.querySelector("#main > div.bookmark-bar.default") !== null;
+    }
+
+    // Helper function to calculate dynamic height
+    function calculateHeight() {
+        return `calc(100vh - 83px ${!isBookmarksBarEnabled() ? "+ 29px" : ""})`;
+    }
+
     // Use configurable settings
     const config = {
-        height: `calc(100vh - 83px ${!isBookmarksBarEnabled() ? "+ 28px" : ""})`,
         hiddenWidth: "34px",
         minimizedWidth: "72px",
         expandedWidth: "260px",
@@ -15,7 +24,7 @@
         transitionAnimation: "0.05s linear", // ms
     };
 
-    const bookmarksBarInHeightCalc = false;
+    let bookmarksBarInHeightCalc = false;
 
     // State constants
     const SIDEPANEL_STATES = {
@@ -48,6 +57,7 @@
     let buttonObserver = null;
     let toggleObserver = null;
     let panelObserver = null;
+    let bookmarksObserver = null;
 
     // === INITIALIZATION ===
     function init() {
@@ -56,12 +66,11 @@
         panelsContainer = document.getElementById("panels-container");
         toggleButton = document.querySelector("#panels #switch div.button-toolbar.toolbar-spacer-flexible");
 
+        console.log("[init] Bookmarks bar enabled:", isBookmarksBarEnabled());
+        bookmarksBarInHeightCalc = isBookmarksBarEnabled();
+
         if (!panelsContainer) {
             return false;
-        }
-
-        if ((isBookmarksBarEnabled() && bookmarksBarInHeightCalc) || (!isBookmarksBarEnabled() && !bookmarksBarInHeightCalc)) {
-            setState(currentState);
         }
 
         if (isAlreadyInitialized()) {
@@ -74,6 +83,7 @@
         markAsInitialized();
         setupToggleButton();
         setupPanelWidthObserver();
+        setupBookmarksBarObserver();
         setupToolbarClickListener();
 
         return true;
@@ -144,7 +154,7 @@
             }
             #panels-container {
                 position: absolute !important;
-                height: ${config.height} !important;
+                height: ${calculateHeight()} !important;
                 transition: width ${config.transitionAnimation} !important;
             }
             .panel-collapse-guard {
@@ -355,6 +365,44 @@
         console.log("[setupPanelWidthObserver] Panel width observer started");
     }
 
+    function setupBookmarksBarObserver() {
+        console.log("[setupBookmarksBarObserver] Setting up bookmarks bar observer");
+
+        let previousBookmarksBarState = isBookmarksBarEnabled();
+
+        // Create observer to watch for DOM changes that might affect bookmarks bar
+        bookmarksObserver = new MutationObserver((mutations) => {
+            const currentBookmarksBarState = isBookmarksBarEnabled();
+
+            if (currentBookmarksBarState !== previousBookmarksBarState) {
+                console.log("[setupBookmarksBarObserver] Bookmarks bar state changed from", previousBookmarksBarState, "to", currentBookmarksBarState);
+                previousBookmarksBarState = currentBookmarksBarState;
+                bookmarksBarInHeightCalc = currentBookmarksBarState;
+
+                // Re-apply styles with new height calculation if not in PINNED state
+                if (currentState !== SIDEPANEL_STATES.PINNED) {
+                    console.log("[setupBookmarksBarObserver] Re-applying styles due to bookmarks bar change");
+                    const widthToUse = currentState === SIDEPANEL_STATES.HIDDEN ? config.hiddenWidth : config.minimizedWidth;
+                    applyStyles(widthToUse);
+                }
+            }
+        });
+
+        // Start observing the main container for changes
+        const mainContainer = document.querySelector("#main");
+        if (mainContainer) {
+            bookmarksObserver.observe(mainContainer, {
+                childList: true,
+                subtree: true,
+                attributes: true,
+                attributeFilter: ["class", "style"],
+            });
+            console.log("[setupBookmarksBarObserver] Bookmarks bar observer started");
+        } else {
+            console.log("[setupBookmarksBarObserver] Main container not found, observer not started");
+        }
+    }
+
     // === TOOLBAR CLICK LISTENER ===
     function setupToolbarClickListener() {
         const toolbarElement = document.querySelector("#panels > #switch > div.toolbar");
@@ -424,11 +472,11 @@
     }
 
     function isSharpTabsButton(button) {
-        return button.getAttribute("aria-label") === "Sharp Tabs" || button.getAttribute("aria-label").includes("/sb.html");
+        return button.getAttribute("aria-label").startsWith("Sharp Tabs") || button.getAttribute("aria-label").includes("/sb.html");
     }
 
     function getActiveSharpTabsButton() {
-        return document.querySelector('.button-toolbar.active > button[aria-label="Sharp Tabs"], .button-toolbar.active > button[aria-label*="/sb.html"]');
+        return document.querySelector('.button-toolbar.active > button[aria-label^="Sharp Tabs"], .button-toolbar.active > button[aria-label*="/sb.html"]');
     }
 
     function reactToPanelContainerWidthModification() {
@@ -508,6 +556,9 @@
         if (panelObserver) {
             panelObserver.disconnect();
         }
+        if (bookmarksObserver) {
+            bookmarksObserver.disconnect();
+        }
 
         // Remove styles
         removeStyles();
@@ -536,13 +587,3 @@
     console.log("[SCRIPT START] Vivaldi Sidebar Manager starting execution. Looking for panels-container to initialize styles on it.");
     initInterval = setInterval(initializeManager, config.initCheckInterval);
 })();
-
-function isBookmarksBarEnabled() {
-    if (document.querySelector("#main > div.bookmark-bar.default")) {
-        bookmarksBarInHeightCalc = true;
-        return true;
-    } else {
-        bookmarksBarInHeightCalc = false;
-        return false;
-    }
-}
