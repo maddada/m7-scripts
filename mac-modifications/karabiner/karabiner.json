@@ -654,12 +654,12 @@
                         ]
                     },
                     {
-                        "description": "Alt + Shift + G types 'c87xrCK93d0FFam5fs'",
+                        "description": "Cmd + Alt + Shift + G types 'c87xrCK93d0FFam5fs'",
                         "manipulators": [
                             {
                                 "from": {
                                     "key_code": "g",
-                                    "modifiers": { "mandatory": ["option", "shift"] }
+                                    "modifiers": { "mandatory": ["option", "shift", "command"] }
                                 },
                                 "to": [
                                     { "key_code": "c" },

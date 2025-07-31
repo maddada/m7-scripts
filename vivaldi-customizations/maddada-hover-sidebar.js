@@ -24,8 +24,6 @@
         transitionAnimation: "0.05s linear", // ms
     };
 
-    let bookmarksBarInHeightCalc = false;
-
     // State constants
     const SIDEPANEL_STATES = {
         PINNED: "pinned",
