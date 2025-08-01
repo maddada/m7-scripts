@@ -698,6 +698,21 @@
                         ]
                     },
                     {
+                        "description": "Cmd + Alt + Shift + D types today's date (YYYY-MM-DD)",
+                        "manipulators": [
+                            {
+                                "from": {
+                                    "key_code": "d",
+                                    "modifiers": { "mandatory": ["option", "shift", "command"] }
+                                },
+                                "to": [
+                                    { "shell_command": "osascript -e '\nset currentDate to (current date)\nset theYear to year of currentDate\nset theMonth to (month of currentDate) as integer\nset theDay to day of currentDate\nset monthStr to text -2 thru -1 of (\"0\" & theMonth)\nset dayStr to text -2 thru -1 of (\"0\" & theDay)\nset formattedDate to (theYear as string) & \"-\" & monthStr & \"-\" & dayStr\ntell application \"System Events\" to keystroke formattedDate\n'" }
+                                ],
+                                "type": "basic"
+                            }
+                        ]
+                    },
+                    {
                         "enabled": false,
                         "manipulators": [
                             {
