@@ -1,0 +1,38 @@
+Stop bouncing app icons on notifications in dock
+> defaults write com.apple.dock no-bouncing -bool TRUE;
+
+---
+
+More commands from this gist:
+https://gist.github.com/vividvilla/04c1a54387ead1ee831d097b9ec16bb2
+
+---
+
+## Mac OS X: Disable the creation of .DS_store files
+> defaults write com.apple.desktopservices DSDontWriteNetworkStores TRUE
+
+Default:
+> defaults delete com.apple.desktopservices DSDontWriteNetworkStores
+
+---
+
+##Increase the speed of OS X dialogs boxes:
+> defaults write NSGlobalDomain NSWindowResizeTime .1
+
+change .1 to .001 to make dialogs instantly appear
+
+Default:
+> defaults write NSGlobalDomain NSWindowResizeTime .5
+
+---
+
+##Disable Window Animations to Speed shit up a tad
+> defaults write NSGlobalDomain NSAutomaticWindowAnimationsEnabled -bool false
+
+Default:
+> defaults write NSGlobalDomain NSAutomaticWindowAnimationsEnabled -bool true
+
+---
+
+Then restart dock:
+> killall Dock

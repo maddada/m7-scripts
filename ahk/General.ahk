@@ -15,6 +15,77 @@ runningIcon := 'C:\Users\madda\Pictures\ico\soundon.ico'
 autoScrollToggle := false
 autoClickToggle := false
 
+; Reload script when cursor is active
+; (check if it's been modified in the last 5 seconds when ctrl+s is pressed)
+#HotIf WinActive("ahk_exe Cursor.exe")
+~^s:: {
+    scriptPath := A_ScriptFullPath
+    lastModified := FileGetTime(scriptPath, "M")
+    now := DateAdd(A_Now, 0, "Seconds") ; Current time
+    diff := DateDiff(now, lastModified, "Seconds")
+    if Abs(diff) <= 5 {
+        Reload
+    }
+}
+#HotIf
+
+; VLC -> Use mouse buttons to navigate
+#HotIf WinActive("ahk_exe vlc.exe")
+XButton1::Send("{Left}")    ; Mouse4 -> Left Arrow
+XButton2::Send("{Right}")   ; Mouse5 -> Right Arrow
+MButton::Send("{Space}")    ; Mouse3 (Middle) -> Space
+#HotIf
+
+; Screenbox -> Use mouse buttons to navigate (holding down the button repeats the actions)
+#HotIf WinActive("ahk_exe ApplicationFrameHost.exe")
+XButton1:: {
+    while GetKeyState("XButton1", "P") {
+        Send "+{Left}"
+        Send "+{Left}"
+        Sleep 200
+    }
+    return
+}
+
+XButton2:: {
+    while GetKeyState("XButton2", "P") {
+        Send "+{Right}"
+        Send "+{Right}"
+        Sleep 200
+    }
+    return
+}
+#HotIf
+
+; Remapping apps key/copilot key to right ctrl (remapping in power toys is better so this is disabled)
+; AppsKey::RCtrl
+; #+F23::RCtrl
+
+; Remapping keys for the surface laptop (not needed on Aura)
+; F9::Home    ; F9 -> Home (for surface laptop)
+; F10::End    ; F10 -> End (for surface laptop)
+; F11::PgUp   ; F11 -> Page Up (for surface laptop)
+; F12::PgDn   ; F12 -> Page Down (for surface laptop)
+
+; !F8::F8     ; Alt+F8 -> F8
+; !F9::F9     ; Alt+F9 -> F9
+; !F10::F10   ; Alt+F10 -> F10
+; !F11::F11   ; Alt+F11 -> F11
+; !F12::F12   ; Alt+F12 -> F12
+
+; Copy and paste with 1 key for jira pasting labels (2025-05-07)
+;c::Send("^c")
+;v::{
+;    Send("^v")
+;    Sleep(100)
+;    Send("^+q")
+;    Sleep(100)
+;    Send("{Enter}")
+;    return
+;}
+;a::{
+;}
+
 ; This part makes sure this script is running as admin
 full_command_line := DllCall("GetCommandLine", "str")
 ; msgBox "A_IsAdmin: " A_IsAdmin "`nCommand line: " full_command_line ; For Debugging
