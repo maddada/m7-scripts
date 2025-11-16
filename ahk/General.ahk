@@ -15,20 +15,6 @@ runningIcon := 'C:\Users\madda\Pictures\ico\soundon.ico'
 autoScrollToggle := false
 autoClickToggle := false
 
-AppsKey::RCtrl
-#+F23::RCtrl
-
-F9::Home    ; F9 -> Home (for surface laptop)
-F10::End    ; F10 -> End (for surface laptop)
-F11::PgUp   ; F11 -> Page Up (for surface laptop)
-F12::PgDn   ; F12 -> Page Down (for surface laptop)
-
-!F8::F8     ; Alt+F8 -> F8
-!F9::F9     ; Alt+F9 -> F9
-!F10::F10   ; Alt+F10 -> F10
-!F11::F11   ; Alt+F11 -> F11
-!F12::F12   ; Alt+F12 -> F12
-
 ; This part makes sure this script is running as admin
 full_command_line := DllCall("GetCommandLine", "str")
 ; msgBox "A_IsAdmin: " A_IsAdmin "`nCommand line: " full_command_line ; For Debugging
@@ -54,6 +40,24 @@ if not (A_IsAdmin or RegExMatch(full_command_line, " /restart(?!\S)")) {
     return
 }
 ; #endregion 🟥 Globals & AHK Stuff
+
+; win + c = end task in terminals (like mac)
+#c::^c
+; win + v = open clipdiary instead of opening windows clipboard
+#v::^`
+
+; alt + left arrow = home
+!Left::Home
+
+; alt + shift + left arrow = shift + home
+!+Left::+Home
+
+; alt + right arrow = end
+!Right::End
+
+; alt + shift + right arrow = shift + end
+!+Right::+End
+
 
 ; #region 🟩 Auto Scroll
 ; Change Tray Icon based on Auto Scroll
@@ -173,120 +177,4 @@ WinActive("ahk_exe Windsurf.exe"))
 +WheelDown:: Send("{WheelRight}")
 #HotIf
 
-; All Apps -> Disable Insert and Delete for copying/pasting
-; ^Insert::return ; using this in ShareX
-; +Insert::return ; using this in ShareX
-
 ; #endregion 🟦 Productivity Section (Browsers, Notion, Slack, VSCode)
-
-; #region 🟨 DaveTheDiverk
-#HotIf (WinActive("ahk_exe DaveTheDiver.exe"))
-; msgBox("daveactive: " WinActive("ahk_exe DaveTheDiver.exe"))
-XButton1::h
-XButton2::j
-; wheelDown::Send("{Blind}{k}")
-; wheelUp::Send("{Blind}{k}")
-#HotIf
-; #endregion 🟨 DaveTheDiver
-
-; #region 🟨 CSGO (Binds & Fix Mis-jump)
-#HotIf WinActive("ahk_exe cs2.exe")
-; Disable Insert Key Taking ShareX Screenshots in CSGO (used to buy awp instead)
-Insert::F7
-
-; Fix Scroll Jumping by Mistake in CSGO
-; global timeSinceLastScroll := 2000
-; global wheelDownCount := 0
-; global wheelDownPreviousTick := 0
-
-; wheelDown:: {
-;     global
-;     if ((A_PriorKey = "wheelDown")
-;         && (A_TickCount - wheelDownPreviousTick < timeSinceLastScroll)
-;         && (wheelDownCount >= 1))
-;     {
-;         Send("{wheelDown}")
-;     }
-;     else
-;     {
-;         if (A_TickCount - wheelDownPreviousTick < timeSinceLastScroll)
-;             wheelDownCount++
-;         else wheelDownCount := 1
-;             wheelDownPreviousTick := A_TickCount
-;     }
-;     return
-; }
-#HotIf
-; #endregion 🟨 CSGO
-
-; 6af
-; Desktop -> Toggles Auto Hide Taskbar by middle clicking on taskbar
-; Might need to click on a window then the taskbar
-; IsMouseOverTaskbar() {
-;     MouseGetPos(&x, &y) ; msgBox "WinTitle: " WinTitle " \nWin: " Win ; For Debugging ; msgBox y > 1300
-;     return y > 1435
-; }
-; #HotIf (IsMouseOverTaskbar() = true)
-;     MButton:: {
-;         CoordMode "Mouse", "Screen"
-;         MouseGetPos &startX, &startY
-;         ; Close Settings if it's already open
-;         if (WinExist("Settings")) {
-;             WinActivate("Settings")
-;             Sleep(300)
-;             Send("!{F4}")
-;             Sleep(300)
-;         }
-;         ; Open Taskbar Settings
-;         Run("ms-settings:taskbar")
-;         Sleep(250)
-;         ; Check if it was opened then go do the keyboard actions to disable
-;         if (WinExist("Settings")) {
-;             WinActivate("Settings")
-;             ;4xshift+tab space tab tab space
-;             Sleep(250)
-;             Send("+{Tab}")
-;             Sleep(250)
-;             Send("+{Tab}")
-;             Sleep(250)
-;             Send("+{Tab}")
-;             Sleep(250)
-;             Send("+{Tab}")
-;             Sleep(250)
-;             Send("{Space}")
-;             Sleep(250)
-;             Send("{Tab}")
-;             Sleep(250)
-;             Send("{Tab}")
-;             Sleep(250)
-;             Send("{Space}")
-;             Sleep(250)
-;             if (WinActive("Settings"))
-;                 Send("!{F4}")
-;             Sleep(250)
-;             Click("3600 1620") ; 32:9 5140x1440
-;             MouseMove(startX, startY)
-;         }
-;     }
-; #HotIf
-
-; #HotIf WinActive("ahk_exe Photo.exe")
-;     LAlt::LCtrl
-;     LCtrl::LAlt
-; #HotIf
-
-; Desktop -> Toggles Night light with PrintScreen (FN+Ins on Deathstalker)
-CapsLock::NumpadEnter
-;PrintScreen:: {
-;    CoordMode "Mouse", "Screen"
-;    MouseGetPos &startX, &startY
-;    Send("#{a}")
-;    Sleep(300)	; change this if it doesn't work
-;    ; Click("1845 745") ; 16:9 1920x1080
-;    ; Click("3355 1100") ; 21:9 3440x1440
-;    Click("4920 1110") ; 32:9 5140x1440
-;    SoundBeep(500, 50)
-;    Sleep(10)
-;    Send("#{a}")
-;    MouseMove(startX, startY)
-;}
