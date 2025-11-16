@@ -41,6 +41,39 @@ if not (A_IsAdmin or RegExMatch(full_command_line, " /restart(?!\S)")) {
 }
 ; #endregion 🟥 Globals & AHK Stuff
 
+; alt + shift + q = quit application forcefully
+!+q::
+{
+    ; Get the Process ID (PID) of the active window ("A")
+    pid := WinGetPID("A")
+
+    ; Check if a valid PID was retrieved
+    if (pid)
+    {
+        ; Forcefully close the process with that PID.
+        ; This will close all windows associated with that application.
+        ProcessClose(pid)
+    }
+}
+
+; alt + shift + q = quit application safely (?)
+; !+q::
+; {
+;     ; Get the executable name (e.g., "chrome.exe") of the active window ("A")
+;     exeName := WinGetProcessName("A")
+
+;     ; Check if a valid name was retrieved
+;     if (exeName)
+;     {
+;         ; Send the "Close" command to all windows associated
+;         ; with that executable name.
+;         WinClose("ahk_exe " exeName)
+;     }
+; }
+
+; alt + q = close window
+!q::!f4
+
 ; win + c = end task in terminals (like mac)
 #c::^c
 ; win + v = open clipdiary instead of opening windows clipboard
@@ -58,6 +91,8 @@ if not (A_IsAdmin or RegExMatch(full_command_line, " /restart(?!\S)")) {
 ; alt + shift + right arrow = shift + end
 !+Right::+End
 
+; capslock = delete
+capslock::delete
 
 ; #region 🟩 Auto Scroll
 ; Change Tray Icon based on Auto Scroll
